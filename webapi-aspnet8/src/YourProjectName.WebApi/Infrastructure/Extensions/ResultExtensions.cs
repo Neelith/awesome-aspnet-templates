@@ -48,6 +48,10 @@ internal static class ResultExtensions
             throw new ArgumentException($"Expected '{errorType}' but '{result.Error.Type} was found instead'");
         }
 
-        return TypedResults.Problem(result.Error.Description, statusCode: (int)statusCode);
+        var errors = result.Error is ValidationError validationError 
+            ? string.Join(", ", validationError.Errors.Select(e => e.Description))
+            : result.Error.Description;
+
+        return TypedResults.Problem(errors, statusCode: (int)statusCode);
     }
 }
