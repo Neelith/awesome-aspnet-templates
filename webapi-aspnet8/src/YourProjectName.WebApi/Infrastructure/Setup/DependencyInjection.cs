@@ -31,7 +31,7 @@ internal static class DependencyInjection
             .AddExceptionHandler<GlobalExceptionHandler>()
             .ConfigureProblemDetails()
             .AddApplicationServices()
-            .AddInfrastructureServices(dbConnectionString, redisSettings)
+            .AddInfrastructureServices(startupLogger, dbConnectionString, redisSettings)
             .AddEndpoints(Assembly.GetExecutingAssembly())
             .AddOpenApiServices();
 
