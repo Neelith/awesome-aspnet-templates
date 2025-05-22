@@ -21,8 +21,6 @@ public sealed class GetWeatherForecastsHandler(
             return GetWeatherForecastsResponse.Create(cachedForecasts);
         }
 
-        //string[] summaries = ["Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"];
-
         var forecasts = await weatherForecastRepository
             .GetWeatherForecasts(query?.TemperatureRangeMin, query?.TemperatureRangeMax);
 
