@@ -11,7 +11,7 @@ internal static class DependencyInjection
     public static IServiceCollection AddAppServices(this WebApplicationBuilder webApplicationBuilder)
     {
         //Add logging
-        webApplicationBuilder.AddLogging();
+        ILogger startupLogger = webApplicationBuilder.AddLogging();
 
         //Get the services collection
         IServiceCollection services = webApplicationBuilder.Services;
@@ -23,7 +23,7 @@ internal static class DependencyInjection
         string? dbConnectionString = configuration.GetConnectionString("YourProjectNameDb");
 
         //Add the redis settings to the container and get an istance of it
-        RedisSettings? redisSettings = services.AddSettings<RedisSettings>(configuration);
+        RedisSettings? redisSettings = services.AddSettings<RedisSettings>(configuration, startupLogger);
 
         //Register services here
         services
