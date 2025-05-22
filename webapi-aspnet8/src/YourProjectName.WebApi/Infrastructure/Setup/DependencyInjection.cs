@@ -2,6 +2,7 @@
 using YourProjectName.Application;
 using YourProjectName.Infrastructure;
 using YourProjectName.Infrastructure.Caching;
+using YourProjectName.Infrastructure.Persistence;
 using YourProjectName.WebApi.Infrastructure.Middlewares;
 
 namespace YourProjectName.WebApi.Infrastructure.Setup;
@@ -55,6 +56,8 @@ internal static class DependencyInjection
         app.UseHttpsRedirection();
 
         //Apply database migrations
-        app.ApplyDatabaseMigrations();
+        using IServiceScope scope = app.Services.CreateScope();
+        ILogger logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+        AddDatabaseMigrationsExtension.ApplyDatabaseMigrations(scope, logger);
     }
 }

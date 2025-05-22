@@ -5,7 +5,7 @@ using YourProjectName.Domain.WeatherForecasts;
 
 namespace YourProjectName.Infrastructure.Persistence
 {
-    public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options), IUnitOfWork
+    internal class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options), IUnitOfWork
     {
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -13,7 +13,6 @@ namespace YourProjectName.Infrastructure.Persistence
             builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         }
 
-        //Set your DB sets here, put them in the IApplicationDbContext interface first
         public DbSet<WeatherForecast> Forecasts { get; set; }
     }
 }
