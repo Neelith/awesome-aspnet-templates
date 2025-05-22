@@ -22,8 +22,8 @@ internal static class DependencyInjection
         //Get the database connection string
         string? dbConnectionString = configuration.GetConnectionString("YourProjectNameDb");
 
-        //Get the redis settings
-        RedisSettings? redisSettings = services.AddRedisSettings(configuration);
+        //Add the redis settings to the container and get an istance of it
+        RedisSettings? redisSettings = services.AddSettings<RedisSettings>(configuration);
 
         //Register services here
         services
