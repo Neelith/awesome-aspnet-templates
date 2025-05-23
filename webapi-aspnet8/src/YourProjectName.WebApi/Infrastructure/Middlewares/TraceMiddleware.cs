@@ -12,7 +12,7 @@ public class TraceMiddleware(RequestDelegate next)
             : context.TraceIdentifier;
 
         context.Response.Headers.TryAdd(Headers.Trace, traceId);
-        
+
         using var logcontext = LogContext.PushProperty("TraceIdentifier", traceId);
 
         await next(context);

@@ -69,8 +69,8 @@ internal static class ValidationDecorator
     }
 
     private static async Task<ValidationFailure[]> ValidateAndCollectFailures<T>(
-        ValidationContext<T> context, 
-        IEnumerable<IValidator<T>> validators, 
+        ValidationContext<T> context,
+        IEnumerable<IValidator<T>> validators,
         CancellationToken? cancellationToken = default)
     {
         ValidationResult[] validationResults = await Task.WhenAll(

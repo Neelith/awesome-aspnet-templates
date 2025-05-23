@@ -11,7 +11,7 @@ public static class DependencyInjection
     public static IServiceCollection AddInfrastructureServices(
         this IServiceCollection services,
         ILogger logger,
-        string? dbConnectionString, 
+        string? dbConnectionString,
         RedisSettings? redisSettings = default)
     {
         //Register infrastructure services here

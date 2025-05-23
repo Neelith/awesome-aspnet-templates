@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using YourProjectName.Application.Infrastructure.Handlers;
 using YourProjectName.Shared.Results;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace YourProjectName.Application.Infrastructure.Decorators;
 internal static class LoggingDecorator
@@ -87,13 +86,13 @@ internal static class LoggingDecorator
             }
             else
             {
-                var errors = result.Error is ValidationError validationError 
+                var errors = result.Error is ValidationError validationError
                     ? string.Join(", ", validationError.Errors.Select(e => e.Description))
                     : result.Error.Description;
 
-                logger.LogError("Completed query {QueryName} with one or more errors. Error code: {ErrorCode}. Error type: {ErrorType}. Errors: {Errors}", 
-                    typeof(TQuery).Name, 
-                    result.Error.Code, 
+                logger.LogError("Completed query {QueryName} with one or more errors. Error code: {ErrorCode}. Error type: {ErrorType}. Errors: {Errors}",
+                    typeof(TQuery).Name,
+                    result.Error.Code,
                     result.Error.Type,
                     errors);
             }

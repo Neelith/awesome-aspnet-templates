@@ -6,7 +6,7 @@ using YourProjectName.Application.Infrastructure.Caching;
 namespace YourProjectName.Infrastructure.Caching;
 internal class RedisCache(
     IDistributedCache distributedCache,
-    ILogger<RedisCache> logger) 
+    ILogger<RedisCache> logger)
     : IRedisCache
 {
     public async Task<T?> GetAsync<T>(string key, CancellationToken cancellationToken = default)
@@ -20,7 +20,7 @@ internal class RedisCache(
         logger.LogDebug("Attempting to get value from cache for key: {Key}", key);
 
         var value = await distributedCache.GetStringAsync(key, cancellationToken);
-        
+
         if (string.IsNullOrEmpty(value))
         {
             logger.LogInformation("Cache miss for key: {Key}", key);
@@ -52,7 +52,7 @@ internal class RedisCache(
         var json = JsonSerializer.Serialize(value);
 
         await distributedCache.SetStringAsync(key, json, options, cancellationToken);
-        
+
         logger.LogInformation("Value set in cache for key: {Key}", key);
     }
 

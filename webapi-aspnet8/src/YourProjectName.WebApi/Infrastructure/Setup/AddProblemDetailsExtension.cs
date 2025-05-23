@@ -1,5 +1,4 @@
-﻿using Serilog.Events;
-using YourProjectName.WebApi.Constants;
+﻿using YourProjectName.WebApi.Constants;
 
 namespace YourProjectName.WebApi.Infrastructure.Setup;
 

@@ -48,7 +48,7 @@ internal static class ResultExtensions
             throw new ArgumentException($"Expected '{errorType}' but '{result.Error.Type} was found instead'");
         }
 
-        var errors = result.Error is ValidationError validationError 
+        var errors = result.Error is ValidationError validationError
             ? string.Join(", ", validationError.Errors.Select(e => e.Description))
             : result.Error.Description;
 

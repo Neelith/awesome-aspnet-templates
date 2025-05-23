@@ -6,8 +6,8 @@ namespace YourProjectName.Infrastructure.Caching;
 internal static class AddRedisExtension
 {
     public static IServiceCollection AddRedis(
-        this IServiceCollection services, 
-        RedisSettings? redisSettings, 
+        this IServiceCollection services,
+        RedisSettings? redisSettings,
         ILogger logger)
     {
         //Add redis only if we have a proper connection string configured
