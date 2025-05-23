@@ -1,6 +1,5 @@
 ﻿using Serilog;
 using Serilog.Extensions.Logging;
-using YourProjectName.WebApi.Infrastructure.Middlewares;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace YourProjectName.WebApi.Infrastructure.Setup;
@@ -21,8 +20,6 @@ public static class AddLoggingExtension
 
     public static void UseLogging(this WebApplication app)
     {
-        app.UseMiddleware<TraceLoggerMiddleware>();
-
         app.UseSerilogRequestLogging();
     }
 

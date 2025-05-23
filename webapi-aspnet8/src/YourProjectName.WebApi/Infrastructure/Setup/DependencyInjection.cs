@@ -28,6 +28,7 @@ internal static class DependencyInjection
 
         //Register services here
         services
+            .AddHttpContextAccessor()
             .AddExceptionHandler<GlobalExceptionHandler>()
             .ConfigureProblemDetails()
             .AddApplicationServices()
