@@ -3,10 +3,14 @@ using YourProjectName.Domain.WeatherForecasts;
 
 namespace YourProjectName.Application.Features.WeatherForecasts.GetWeatherForecasts;
 
-public sealed record GetWeatherForecastsResponse() : DataResponse<GetWeatherForecastsDataResponse>
+public sealed record GetWeatherForecastsResponse : IDataResponse<GetWeatherForecastsDataResponse>
 {
-    public static GetWeatherForecastsResponse Create(IEnumerable<WeatherForecast> forecasts)
-        => Create<GetWeatherForecastsResponse>(new GetWeatherForecastsDataResponse(forecasts));
+    public GetWeatherForecastsDataResponse Data { get; init; }
+
+    public GetWeatherForecastsResponse(IEnumerable<WeatherForecast> forecasts)
+    {
+        Data = new GetWeatherForecastsDataResponse(forecasts ?? []);
+    }
 };
 
 public sealed record GetWeatherForecastsDataResponse(IEnumerable<WeatherForecast> Forecasts);

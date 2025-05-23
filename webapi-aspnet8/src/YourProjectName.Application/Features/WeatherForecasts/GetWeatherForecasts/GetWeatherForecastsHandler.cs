@@ -18,13 +18,13 @@ public sealed class GetWeatherForecastsHandler(
 
         if (cachedForecasts is not null)
         {
-            return GetWeatherForecastsResponse.Create(cachedForecasts);
+            return new GetWeatherForecastsResponse(cachedForecasts);
         }
 
         var forecasts = await weatherForecastRepository
             .GetWeatherForecasts(query?.TemperatureRangeMin, query?.TemperatureRangeMax);
 
-        var response = GetWeatherForecastsResponse.Create(forecasts);
+        var response = new GetWeatherForecastsResponse(forecasts);
 
         await redisCache.SetAsync(cacheKey, forecasts, TimeSpan.FromMinutes(2));
 
