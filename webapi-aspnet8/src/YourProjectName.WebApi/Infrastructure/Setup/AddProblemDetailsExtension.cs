@@ -1,4 +1,7 @@
-﻿namespace YourProjectName.WebApi.Infrastructure.Setup;
+﻿using Serilog.Events;
+using YourProjectName.WebApi.Constants;
+
+namespace YourProjectName.WebApi.Infrastructure.Setup;
 
 internal static class AddProblemDetailsExtension
 {
@@ -14,13 +17,18 @@ internal static class AddProblemDetailsExtension
 
                         if (context.Exception is null)
                         {
-
                             var method = httpContext.Request.Method;
                             context.ProblemDetails.Extensions.TryAdd("method", method);
 
                             context.ProblemDetails.Extensions.TryAdd("endpoint", $"{method} {instance}");
-
                         }
+
+                        // Add traceId property
+                        string traceId = httpContext.Request.Headers.TryGetValue(Headers.Trace, out var traceHeader)
+                            ? traceHeader.ToString()
+                            : httpContext.TraceIdentifier;
+
+                        context.ProblemDetails.Extensions.TryAdd("traceId", traceId);
 
                     });
 

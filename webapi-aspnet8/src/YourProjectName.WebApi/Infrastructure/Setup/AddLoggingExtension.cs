@@ -1,5 +1,6 @@
 ﻿using Serilog;
 using Serilog.Extensions.Logging;
+using YourProjectName.WebApi.Infrastructure.Middlewares;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace YourProjectName.WebApi.Infrastructure.Setup;

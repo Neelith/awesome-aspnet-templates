@@ -42,6 +42,9 @@ internal static class DependencyInjection
     // Configure the HTTP request pipeline.
     public static void UseAppServices(this WebApplication app)
     {
+        //Add x-trace header to all responses
+        app.UseMiddleware<TraceMiddleware>();
+
         //Enable logging
         app.UseLogging();
 
