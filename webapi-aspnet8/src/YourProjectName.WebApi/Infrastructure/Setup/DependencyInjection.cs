@@ -4,6 +4,7 @@ using YourProjectName.Infrastructure;
 using YourProjectName.Infrastructure.Caching;
 using YourProjectName.Infrastructure.Persistence;
 using YourProjectName.WebApi.Infrastructure.Middlewares;
+using YourProjectName.WebApi.Infrastructure.Settings;
 
 namespace YourProjectName.WebApi.Infrastructure.Setup;
 
@@ -26,11 +27,16 @@ internal static class DependencyInjection
         //Add the redis settings to the container and get an istance of it
         RedisSettings? redisSettings = services.AddSettings<RedisSettings>(configuration, startupLogger);
 
+        //Add the jwt settings to the container and get an istance of it
+        JwtSettings? jwtSettings = services.AddSettings<JwtSettings>(configuration, startupLogger);
+
         //Register services here
         services
             .AddHttpContextAccessor()
             .AddExceptionHandler<GlobalExceptionHandler>()
             .ConfigureProblemDetails()
+            .AddAuthenticationServices(jwtSettings)
+            .AddAuthorizationServices()
             .AddApplicationServices()
             .AddInfrastructureServices(startupLogger, dbConnectionString, redisSettings)
             .AddEndpoints(Assembly.GetExecutingAssembly())
@@ -50,6 +56,11 @@ internal static class DependencyInjection
 
         //Enable global exception handling
         app.UseExceptionHandler();
+
+        //Add authentication and authorization middlewares
+        app.UseAuthentication();
+
+        app.UseAuthorization();
 
         //Register all the endpoints that implement the IEndpoints interface
         app.MapEndpoints();

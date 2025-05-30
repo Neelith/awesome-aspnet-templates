@@ -15,6 +15,24 @@ public class WeatherForecastsEndpoints : IEndpoints
             .WithTags(Tags.WeatherForecast)
             .WithDescription("Weather forecast endpoints");
 
+        group.MapGet("/secured", async
+            ([AsParameters] GetWeatherForecastsQuery query,
+            [FromServices] IQueryHandler<GetWeatherForecastsQuery, GetWeatherForecastsResponse> handler,
+            [FromServices] IHttpContextAccessor contextAccessor) =>
+        {
+            var user = contextAccessor?.HttpContext?.User;
+            var result = await handler.Handle(query);
+
+            return result.Match(
+                result => TypedResults.Ok(result.Value),
+                result => result.ToErrorResponse()
+            );
+        })
+            .Produces<GetWeatherForecastsResponse>(StatusCodes.Status200OK)
+            .Produces<ProblemDetails>(StatusCodes.Status400BadRequest)
+            .Produces<ProblemDetails>(StatusCodes.Status500InternalServerError)
+            .RequireAuthorization();
+
         group.MapGet("/", async
             ([AsParameters] GetWeatherForecastsQuery query,
             [FromServices] IQueryHandler<GetWeatherForecastsQuery, GetWeatherForecastsResponse> handler) =>

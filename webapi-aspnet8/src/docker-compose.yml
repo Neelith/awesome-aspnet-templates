@@ -14,6 +14,8 @@ services:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+    # volumes:
+    #   - ./.containers/db:/var/lib/postgresql/data
     ports:
       - 5432:5432
   redis-compose:
@@ -21,3 +23,14 @@ services:
     container_name: redis
     ports:
       - 6379:6379
+  keycloak-compose:
+    image: quay.io/keycloak/keycloak:26.2.5
+    container_name: keycloak
+    environment:
+      - KC_BOOTSTRAP_ADMIN_USERNAME=admin
+      - KC_BOOTSTRAP_ADMIN_PASSWORD=admin
+    command: start-dev --import-realm
+    ports:
+      - 5000:8080
+    volumes:
+      - C:/Users/ale/Containers/Keycloak:/opt/keycloak/data/import
