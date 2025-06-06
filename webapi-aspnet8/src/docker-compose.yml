@@ -32,6 +32,5 @@ services:
     command: start-dev --import-realm
     ports:
       - 5000:8080
-    #TODO: change this to src path
     volumes:
-      - C:/Users/ale/Containers/Keycloak:/opt/keycloak/data/import
+      - ./containers/keycloak:/opt/keycloak/data/import
