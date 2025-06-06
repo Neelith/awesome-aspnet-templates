@@ -2,7 +2,7 @@
 using Microsoft.IdentityModel.Tokens;
 using YourProjectName.WebApi.Infrastructure.Settings;
 
-namespace YourProjectName.WebApi.Infrastructure.Setup;
+namespace YourProjectName.WebApi.Infrastructure.Setup.Extensions;
 
 public static class AddAuthenticationExtension
 {

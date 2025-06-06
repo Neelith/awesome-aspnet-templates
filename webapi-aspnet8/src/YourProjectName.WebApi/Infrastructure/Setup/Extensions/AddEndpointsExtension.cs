@@ -2,7 +2,7 @@
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using YourProjectName.WebApi.Endpoints;
 
-namespace YourProjectName.WebApi.Infrastructure.Setup;
+namespace YourProjectName.WebApi.Infrastructure.Setup.Extensions;
 
 internal static class AddEndpointsExtension
 {

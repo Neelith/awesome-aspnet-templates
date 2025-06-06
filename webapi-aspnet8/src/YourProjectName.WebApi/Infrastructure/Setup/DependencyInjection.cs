@@ -3,8 +3,9 @@ using YourProjectName.Application;
 using YourProjectName.Infrastructure;
 using YourProjectName.Infrastructure.Caching;
 using YourProjectName.Infrastructure.Persistence;
-using YourProjectName.WebApi.Infrastructure.Middlewares;
 using YourProjectName.WebApi.Infrastructure.Settings;
+using YourProjectName.WebApi.Infrastructure.Setup.Extensions;
+using YourProjectName.WebApi.Infrastructure.Setup.Middlewares;
 
 namespace YourProjectName.WebApi.Infrastructure.Setup;
 

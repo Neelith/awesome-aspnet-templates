@@ -2,7 +2,7 @@
 using Serilog.Extensions.Logging;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
-namespace YourProjectName.WebApi.Infrastructure.Setup;
+namespace YourProjectName.WebApi.Infrastructure.Setup.Extensions;
 
 public static class AddLoggingExtension
 {

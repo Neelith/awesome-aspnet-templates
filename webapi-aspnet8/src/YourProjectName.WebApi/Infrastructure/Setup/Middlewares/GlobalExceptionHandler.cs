@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using YourProjectName.WebApi.Constants;
 
-namespace YourProjectName.WebApi.Infrastructure.Middlewares;
+namespace YourProjectName.WebApi.Infrastructure.Setup.Middlewares;
 
 internal sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger)
     : IExceptionHandler

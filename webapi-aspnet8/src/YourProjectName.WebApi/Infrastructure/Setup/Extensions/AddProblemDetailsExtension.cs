@@ -1,6 +1,6 @@
 ﻿using YourProjectName.WebApi.Constants;
 
-namespace YourProjectName.WebApi.Infrastructure.Setup;
+namespace YourProjectName.WebApi.Infrastructure.Setup.Extensions;
 
 internal static class AddProblemDetailsExtension
 {

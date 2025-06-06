@@ -1,7 +1,7 @@
 ﻿using Serilog.Context;
 using YourProjectName.WebApi.Constants;
 
-namespace YourProjectName.WebApi.Infrastructure.Middlewares;
+namespace YourProjectName.WebApi.Infrastructure.Setup.Middlewares;
 
 public class TraceMiddleware(RequestDelegate next)
 {
