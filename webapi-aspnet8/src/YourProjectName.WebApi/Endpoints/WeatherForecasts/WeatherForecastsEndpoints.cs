@@ -29,8 +29,8 @@ public class WeatherForecastsEndpoints : IEndpoints
             );
         })
             .Produces<GetWeatherForecastsResponse>(StatusCodes.Status200OK)
-            .Produces<ProblemDetails>(StatusCodes.Status400BadRequest)
-            .Produces<ProblemDetails>(StatusCodes.Status500InternalServerError)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status500InternalServerError)
             .RequireAuthorization();
 
         group.MapGet("/", async
@@ -45,8 +45,8 @@ public class WeatherForecastsEndpoints : IEndpoints
                 );
             })
             .Produces<GetWeatherForecastsResponse>(StatusCodes.Status200OK)
-            .Produces<ProblemDetails>(StatusCodes.Status400BadRequest)
-            .Produces<ProblemDetails>(StatusCodes.Status500InternalServerError);
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status500InternalServerError);
 
         group.MapGet("/exception",
             async Task<IResult>
@@ -54,7 +54,7 @@ public class WeatherForecastsEndpoints : IEndpoints
             {
                 throw new Exception("Test exception");
             })
-            .Produces<ProblemDetails>(StatusCodes.Status400BadRequest);
+            .ProducesProblem(StatusCodes.Status400BadRequest);
 
         group.MapGet("/bad",
             async Task<IResult>
@@ -63,7 +63,7 @@ public class WeatherForecastsEndpoints : IEndpoints
                 var result = Result.Fail(new Error("Test.Error", "A very bad request", ErrorType.Validation));
                 return result.ToErrorResponse();
             })
-            .Produces<ProblemDetails>(StatusCodes.Status400BadRequest);
+            .ProducesProblem(StatusCodes.Status400BadRequest);
 
     }
 }
