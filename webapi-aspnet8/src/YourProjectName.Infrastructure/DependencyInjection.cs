@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using YourProjectName.Infrastructure.Caching;
 using YourProjectName.Infrastructure.Persistence;
 using YourProjectName.Infrastructure.Persistence.Repositories;
+using YourProjectName.Infrastructure.Time;
 
 namespace YourProjectName.Infrastructure;
 
@@ -17,7 +18,8 @@ public static class DependencyInjection
         //Register infrastructure services here
         ArgumentNullException.ThrowIfNull(dbConnectionString, nameof(dbConnectionString));
 
-        services.AddDbContext(dbConnectionString)
+        services.AddTime()
+                .AddDbContext(dbConnectionString)
                 .AddRepositories()
                 .AddRedis(redisSettings, logger);
 
