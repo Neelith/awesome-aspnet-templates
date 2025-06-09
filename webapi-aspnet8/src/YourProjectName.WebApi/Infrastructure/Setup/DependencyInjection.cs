@@ -41,7 +41,7 @@ internal static class DependencyInjection
             .AddApplicationServices()
             .AddInfrastructureServices(startupLogger, dbConnectionString, redisSettings)
             .AddEndpoints(Assembly.GetExecutingAssembly())
-            .AddOpenApiServices();
+            .AddOpenApiServices(jwtSettings);
 
         return services;
     }
