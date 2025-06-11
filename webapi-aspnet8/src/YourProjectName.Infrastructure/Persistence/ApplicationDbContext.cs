@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using YourProjectName.Application.Infrastructure.Persistance;
 using YourProjectName.Domain.WeatherForecasts;
 using YourProjectName.Shared.Domain;
@@ -7,7 +8,8 @@ using YourProjectName.Shared.Time;
 
 namespace YourProjectName.Infrastructure.Persistence
 {
-    internal class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IDateTimeProvider dateTimeProvider) : DbContext(options), IUnitOfWork
+    internal class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IDateTimeProvider dateTimeProvider) 
+        : DbContext(options), IUnitOfWork
     {
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -17,23 +19,63 @@ namespace YourProjectName.Infrastructure.Persistence
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
-            SetUpdatedAtUtcOnEveryAuditableEntity();
+            SetAuditablePropertiesOnCreatedEntities();
+
+            SetAuditablePropertiesOnUpdatedEntities();
 
             return base.SaveChangesAsync(cancellationToken);
         }
 
-        private void SetUpdatedAtUtcOnEveryAuditableEntity()
+        private void SetAuditablePropertiesOnCreatedEntities()
+        {
+            var entitiesBeignCreated = ChangeTracker.Entries<AuditableEntity>()
+                .Where(entry => entry.State == EntityState.Added);
+
+            foreach (var entry in entitiesBeignCreated)
+            {
+                entry.Entity.CreatedAtUtc = dateTimeProvider.UtcNow;
+            }
+        }
+
+        private void SetAuditablePropertiesOnUpdatedEntities()
         {
             var entitiesBeignUpdated = ChangeTracker.Entries<AuditableEntity>()
                 .Where(entry => entry.State == EntityState.Modified);
 
             foreach (var entry in entitiesBeignUpdated)
             {
-                if (entry.State == EntityState.Modified)
-                {
-                    entry.Entity.UpdatedAtUtc = dateTimeProvider.UtcNow;
-                }
+                entry.Entity.UpdatedAtUtc = dateTimeProvider.UtcNow;
             }
+        }
+
+        public async Task BeginTransaction(CancellationToken cancellationToken = default)
+        {
+            if (Database.CurrentTransaction is not null)
+            {
+                throw new InvalidOperationException("A transaction is already in progress.");
+            }
+
+            await Database.BeginTransactionAsync(cancellationToken);
+        }
+
+        public async Task Commit(CancellationToken cancellationToken = default)
+        {
+            if (Database.CurrentTransaction is null)
+            {
+                throw new InvalidOperationException("No transaction is in progress to commit.");
+            }
+
+            await Database.CurrentTransaction.CommitAsync(cancellationToken);
+        }
+
+        public async Task Rollback(CancellationToken cancellationToken = default)
+        {
+            if (Database.CurrentTransaction is null)
+            {
+                throw new InvalidOperationException("No transaction is in progress to roll back.");
+            }
+
+            await Database.CurrentTransaction.RollbackAsync(cancellationToken);
         }
 
         public DbSet<WeatherForecast> Forecasts { get; set; }
