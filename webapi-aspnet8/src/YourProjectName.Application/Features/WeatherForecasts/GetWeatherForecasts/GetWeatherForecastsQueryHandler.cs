@@ -1,11 +1,12 @@
 ﻿using YourProjectName.Application.Infrastructure.Caching;
 using YourProjectName.Application.Infrastructure.Handlers;
 using YourProjectName.Domain.WeatherForecasts;
+using YourProjectName.Domain.WeatherForecasts.Repositories.WeatherForecastRepository;
 using YourProjectName.Shared.Results;
 
 namespace YourProjectName.Application.Features.WeatherForecasts.GetWeatherForecasts;
 
-public sealed class GetWeatherForecastsHandler(
+public sealed class GetWeatherForecastsQueryHandler(
     IWeatherForecastRepository weatherForecastRepository,
     IRedisCache redisCache)
     : IQueryHandler<GetWeatherForecastsQuery, GetWeatherForecastsResponse>

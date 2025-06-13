@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using YourProjectName.Domain.WeatherForecasts;
+using YourProjectName.Domain.WeatherForecasts.Repositories.WeatherForecastRepository;
 
 namespace YourProjectName.Infrastructure.Persistence.Repositories;
 internal static class AddRepositoriesExtension

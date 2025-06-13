@@ -1,9 +1,27 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using YourProjectName.Domain.WeatherForecasts;
+using YourProjectName.Domain.WeatherForecasts.Repositories.WeatherForecastRepository;
+using YourProjectName.Domain.WeatherForecasts.Repositories.WeatherForecastRepository.Commands;
+using YourProjectName.Shared.Results;
 
 namespace YourProjectName.Infrastructure.Persistence.Repositories;
 internal class WeatherForecastRepository(ApplicationDbContext applicationDbContext) : IWeatherForecastRepository
 {
+    public async Task<Result<WeatherForecast>> CreateWeatherForecast(CreateWeatherForecastRepositoryCommand command)
+    {
+        var date = DateOnly.FromDateTime(command.Date);
+        var weatherForecast = WeatherForecast.Create(date, command.TemperatureC, command.Summary);
+
+        if (weatherForecast.IsFailure)
+        {
+            return Result.Fail<WeatherForecast>(weatherForecast.Error);
+        }
+
+        await applicationDbContext.Forecasts.AddAsync(weatherForecast.Value);
+
+        return weatherForecast;
+    }
+
     public async Task<List<WeatherForecast>> GetWeatherForecasts(int? temperatureRangeMin, int? temperatureRangeMax)
     {
         var query = applicationDbContext.Forecasts.AsNoTracking();

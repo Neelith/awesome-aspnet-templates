@@ -34,6 +34,7 @@ namespace YourProjectName.Infrastructure.Persistence
             foreach (var entry in entitiesBeignCreated)
             {
                 entry.Entity.CreatedAtUtc = dateTimeProvider.UtcNow;
+                entry.Entity.CreatedBy = "system";
             }
         }
 
@@ -45,10 +46,11 @@ namespace YourProjectName.Infrastructure.Persistence
             foreach (var entry in entitiesBeignUpdated)
             {
                 entry.Entity.UpdatedAtUtc = dateTimeProvider.UtcNow;
+                entry.Entity.UpdatedBy = "system";
             }
         }
 
-        public async Task BeginTransaction(CancellationToken cancellationToken = default)
+        public async Task BeginTransactionAsync(CancellationToken cancellationToken = default)
         {
             if (Database.CurrentTransaction is not null)
             {
@@ -58,7 +60,7 @@ namespace YourProjectName.Infrastructure.Persistence
             await Database.BeginTransactionAsync(cancellationToken);
         }
 
-        public async Task Commit(CancellationToken cancellationToken = default)
+        public async Task CommitTransactionAsync(CancellationToken cancellationToken = default)
         {
             if (Database.CurrentTransaction is null)
             {
@@ -68,7 +70,7 @@ namespace YourProjectName.Infrastructure.Persistence
             await Database.CurrentTransaction.CommitAsync(cancellationToken);
         }
 
-        public async Task Rollback(CancellationToken cancellationToken = default)
+        public async Task RollbackTransactionAsync(CancellationToken cancellationToken = default)
         {
             if (Database.CurrentTransaction is null)
             {

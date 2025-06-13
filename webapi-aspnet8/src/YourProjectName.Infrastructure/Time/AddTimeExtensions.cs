@@ -6,7 +6,7 @@ internal static class AddTimeExtensions
 {
     public static IServiceCollection AddTime(this IServiceCollection services)
     {
-        services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
+        services.AddScoped<IDateTimeProvider, DateTimeProvider>();
         return services;
     }
 }

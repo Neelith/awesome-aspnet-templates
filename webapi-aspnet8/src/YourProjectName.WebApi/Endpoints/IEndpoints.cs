@@ -1,6 +1,7 @@
-﻿namespace YourProjectName.WebApi.Endpoints;
+﻿using Carter;
 
-public interface IEndpoints
+namespace YourProjectName.WebApi.Endpoints;
+
+public interface IEndpoints : ICarterModule
 {
-    public void AddRoutes(IEndpointRouteBuilder app);
 }

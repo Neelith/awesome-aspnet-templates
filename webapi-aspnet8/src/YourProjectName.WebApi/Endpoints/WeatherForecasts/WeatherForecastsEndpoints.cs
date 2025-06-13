@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using YourProjectName.Application.Features.WeatherForecasts.CreateWeatherForecasts;
 using YourProjectName.Application.Features.WeatherForecasts.GetWeatherForecasts;
 using YourProjectName.Application.Infrastructure.Handlers;
 using YourProjectName.Shared.Results;
@@ -33,7 +34,22 @@ public class WeatherForecastsEndpoints : IEndpoints
             .ProducesProblem(StatusCodes.Status500InternalServerError)
             .RequireAuthorization();
 
-        group.MapGet("/", async
+        group.MapPost("", async
+            ([FromBody] CreateWeatherForecastCommand command, 
+            [FromServices] ICommandHandler<CreateWeatherForecastCommand, CreateWeatherForecastResponse> handler) =>
+        {
+            var result = await handler.Handle(command);
+
+            return result.Match(
+                result => TypedResults.Created($"weatherforecasts/{result.Value.Id}", result.Value),
+                result => result.ToErrorResponse()
+            );
+        })
+            .Produces<CreateWeatherForecastResponse>(StatusCodes.Status201Created)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status500InternalServerError);
+
+        group.MapGet("", async
             ([AsParameters] GetWeatherForecastsQuery query,
             [FromServices] IQueryHandler<GetWeatherForecastsQuery, GetWeatherForecastsResponse> handler) =>
             {
@@ -47,23 +63,6 @@ public class WeatherForecastsEndpoints : IEndpoints
             .Produces<GetWeatherForecastsResponse>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status500InternalServerError);
-
-        group.MapGet("/exception",
-            async Task<IResult>
-            () =>
-            {
-                throw new Exception("Test exception");
-            })
-            .ProducesProblem(StatusCodes.Status400BadRequest);
-
-        group.MapGet("/bad",
-            async Task<IResult>
-            () =>
-            {
-                var result = Result.Fail(new Error("Test.Error", "A very bad request", ErrorType.Validation));
-                return result.ToErrorResponse();
-            })
-            .ProducesProblem(StatusCodes.Status400BadRequest);
 
     }
 }
