@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using YourProjectName.Application.Infrastructure.Handlers;
 using YourProjectName.Application.Infrastructure.Persistance;
+using YourProjectName.Domain.WeatherForecasts;
 using YourProjectName.Domain.WeatherForecasts.Repositories.WeatherForecastRepository;
 using YourProjectName.Domain.WeatherForecasts.Repositories.WeatherForecastRepository.Commands;
 using YourProjectName.Shared.Results;
@@ -32,7 +33,7 @@ public sealed class CreateWeatherForecastCommandHandler(
 
             if (createWeatherForecastResult.IsFailure)
             {
-                return Result.Fail<CreateWeatherForecastResponse>(createWeatherForecastResult.Error);
+                return createWeatherForecastResult.ToFailedOf<CreateWeatherForecastResponse>();
             }
 
             await unitOfWork.SaveChangesAsync(cancellationTokenValue);

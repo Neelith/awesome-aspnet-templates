@@ -56,4 +56,14 @@ public class Result<TValue> : Result
 
     public static Result<TValue> ValidationFailure(Error error) =>
         new(default, false, error);
+
+    public Result<Y> ToFailedOf<Y>()
+    {
+        if (IsSuccess)
+        {
+            throw new InvalidOperationException("Cannot convert a successful result to a failed one.");
+        }
+
+        return Fail<Y>(Error);
+    }
 }

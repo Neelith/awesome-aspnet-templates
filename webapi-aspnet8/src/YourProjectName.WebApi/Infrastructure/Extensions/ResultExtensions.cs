@@ -19,6 +19,19 @@ internal static class ResultExtensions
         return onSuccess(result);
     }
 
+    public static IResult Match(
+        this Result result,
+        Func<Result, IResult> onSuccess,
+        Func<Result, IResult> onFailure)
+    {
+        if (result.IsFailure)
+        {
+            return onFailure(result);
+        }
+
+        return onSuccess(result);
+    }
+
     public static ProblemHttpResult ToErrorResponse<T>(this Result<T> result)
     {
         return ToErrorResponse(result as Result);
