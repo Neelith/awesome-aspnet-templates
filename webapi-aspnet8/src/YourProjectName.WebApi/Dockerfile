@@ -14,7 +14,6 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY . .
 RUN dotnet restore "./YourProjectName.WebApi/YourProjectName.WebApi.csproj"
-COPY . .
 WORKDIR "/src/YourProjectName.WebApi"
 RUN dotnet build "./YourProjectName.WebApi.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
