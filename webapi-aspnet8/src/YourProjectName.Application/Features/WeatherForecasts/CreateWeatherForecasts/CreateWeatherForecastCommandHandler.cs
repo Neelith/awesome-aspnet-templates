@@ -18,10 +18,8 @@ public sealed class CreateWeatherForecastCommandHandler(
     IUnitOfWork unitOfWork) 
     : ICommandHandler<CreateWeatherForecastCommand, CreateWeatherForecastResponse>
 {
-    public async Task<Result<CreateWeatherForecastResponse>> Handle(CreateWeatherForecastCommand command, CancellationToken? cancellationToken = null)
+    public async Task<Result<CreateWeatherForecastResponse>> Handle(CreateWeatherForecastCommand command, CancellationToken cancellationToken)
     {
-        var cancellationTokenValue = cancellationToken ?? CancellationToken.None;
-
         try
         {
             var createWeatherForecastResult = await weatherForecastRepository.CreateWeatherForecast(new CreateWeatherForecastRepositoryCommand
@@ -29,14 +27,14 @@ public sealed class CreateWeatherForecastCommandHandler(
                 Date = command.Date,
                 TemperatureC = command.TemperatureC,
                 Summary = command.Summary
-            });
+            }, cancellationToken);
 
             if (createWeatherForecastResult.IsFailure)
             {
                 return createWeatherForecastResult.ToFailedOf<CreateWeatherForecastResponse>();
             }
 
-            await unitOfWork.SaveChangesAsync(cancellationTokenValue);
+            await unitOfWork.SaveChangesAsync(cancellationToken);
 
             return new CreateWeatherForecastResponse
             {

@@ -11,11 +11,11 @@ public sealed class GetWeatherForecastsQueryHandler(
     IRedisCache redisCache)
     : IQueryHandler<GetWeatherForecastsQuery, GetWeatherForecastsResponse>
 {
-    public async Task<Result<GetWeatherForecastsResponse>> Handle(GetWeatherForecastsQuery? query, CancellationToken? cancellationToken = null)
+    public async Task<Result<GetWeatherForecastsResponse>> Handle(GetWeatherForecastsQuery? query, CancellationToken cancellationToken)
     {
         const string cacheKey = "weatherforecasts";
 
-        var cachedForecasts = await redisCache.GetAsync<List<WeatherForecast>>(cacheKey);
+        var cachedForecasts = await redisCache.GetAsync<List<WeatherForecast>>(cacheKey, cancellationToken);
 
         if (cachedForecasts is not null)
         {
@@ -23,11 +23,11 @@ public sealed class GetWeatherForecastsQueryHandler(
         }
 
         var forecasts = await weatherForecastRepository
-            .GetWeatherForecasts(query?.TemperatureRangeMin, query?.TemperatureRangeMax);
+            .GetWeatherForecasts(query?.TemperatureRangeMin, query?.TemperatureRangeMax, cancellationToken);
 
         var response = new GetWeatherForecastsResponse(forecasts);
 
-        await redisCache.SetAsync(cacheKey, forecasts, TimeSpan.FromMinutes(2));
+        await redisCache.SetAsync(cacheKey, forecasts, TimeSpan.FromMinutes(2), cancellationToken);
 
         return response;
     }

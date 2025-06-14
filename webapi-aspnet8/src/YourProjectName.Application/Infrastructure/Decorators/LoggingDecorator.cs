@@ -10,7 +10,7 @@ internal static class LoggingDecorator
         ILogger<CommandBaseHandler<TCommand>> logger)
         : ICommandHandler<TCommand> where TCommand : ICommand
     {
-        public async Task<Result> Handle(TCommand command, CancellationToken? cancellationToken = default)
+        public async Task<Result> Handle(TCommand command, CancellationToken cancellationToken)
         {
             logger.LogInformation("Processing command {CommandName}", typeof(TCommand).Name);
 
@@ -42,7 +42,7 @@ internal static class LoggingDecorator
         ILogger<CommandHandler<TCommand, TResponse>> logger)
         : ICommandHandler<TCommand, TResponse> where TCommand : ICommand<TResponse>
     {
-        public async Task<Result<TResponse>> Handle(TCommand command, CancellationToken? cancellationToken = default)
+        public async Task<Result<TResponse>> Handle(TCommand command, CancellationToken cancellationToken)
         {
             logger.LogInformation("Processing command {CommandName}", typeof(TCommand).Name);
 
@@ -74,7 +74,7 @@ internal static class LoggingDecorator
         ILogger<QueryHandler<TQuery, TResponse>> logger)
         : IQueryHandler<TQuery, TResponse> where TQuery : IQuery<TResponse>
     {
-        public async Task<Result<TResponse>> Handle(TQuery query, CancellationToken? cancellationToken = default)
+        public async Task<Result<TResponse>> Handle(TQuery query, CancellationToken cancellationToken)
         {
             logger.LogInformation("Processing query {Query}", query);
 

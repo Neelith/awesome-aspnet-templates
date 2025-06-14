@@ -16,54 +16,37 @@ public class WeatherForecastsEndpoints : IEndpoints
             .WithTags(Tags.WeatherForecast)
             .WithDescription("Weather forecast endpoints");
 
-        group.MapGet("/secured", async
+        group.MapGet("", async
             ([AsParameters] GetWeatherForecastsQuery query,
             [FromServices] IQueryHandler<GetWeatherForecastsQuery, GetWeatherForecastsResponse> handler,
-            [FromServices] IHttpContextAccessor contextAccessor) =>
+            CancellationToken cancellationToken) =>
         {
-            var user = contextAccessor?.HttpContext?.User;
-            var result = await handler.Handle(query);
+            var result = await handler.Handle(query, cancellationToken);
 
             return result.Match(
                 result => TypedResults.Ok(result.Value),
                 result => result.ToErrorResponse()
             );
         })
-            .Produces<GetWeatherForecastsResponse>(StatusCodes.Status200OK)
-            .ProducesProblem(StatusCodes.Status400BadRequest)
-            .ProducesProblem(StatusCodes.Status500InternalServerError)
-            .RequireAuthorization();
+        .Produces<GetWeatherForecastsResponse>(StatusCodes.Status200OK)
+        .ProducesProblem(StatusCodes.Status400BadRequest)
+        .ProducesProblem(StatusCodes.Status500InternalServerError)
+        .RequireAuthorization();
 
         group.MapPost("", async
             ([FromBody] CreateWeatherForecastCommand command, 
             [FromServices] ICommandHandler<CreateWeatherForecastCommand, CreateWeatherForecastResponse> handler) =>
         {
-            var result = await handler.Handle(command);
+            var result = await handler.Handle(command, CancellationToken.None);
 
             return result.Match(
                 result => TypedResults.Created($"weatherforecasts/{result.Value.Id}", result.Value),
                 result => result.ToErrorResponse()
             );
         })
-            .Produces<CreateWeatherForecastResponse>(StatusCodes.Status201Created)
-            .ProducesProblem(StatusCodes.Status400BadRequest)
-            .ProducesProblem(StatusCodes.Status500InternalServerError)
-            .RequireAuthorization();
-
-        group.MapGet("", async
-            ([AsParameters] GetWeatherForecastsQuery query,
-            [FromServices] IQueryHandler<GetWeatherForecastsQuery, GetWeatherForecastsResponse> handler) =>
-            {
-                var result = await handler.Handle(query);
-
-                return result.Match(
-                    result => TypedResults.Ok(result.Value),
-                    result => result.ToErrorResponse()
-                );
-            })
-            .Produces<GetWeatherForecastsResponse>(StatusCodes.Status200OK)
-            .ProducesProblem(StatusCodes.Status400BadRequest)
-            .ProducesProblem(StatusCodes.Status500InternalServerError);
-
+        .Produces<CreateWeatherForecastResponse>(StatusCodes.Status201Created)
+        .ProducesProblem(StatusCodes.Status400BadRequest)
+        .ProducesProblem(StatusCodes.Status500InternalServerError)
+        .RequireAuthorization();
     }
 }
