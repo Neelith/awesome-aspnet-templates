@@ -2,13 +2,17 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using YourProjectName.Application.Infrastructure.Persistance;
+using YourProjectName.Application.Infrastructure.User;
 using YourProjectName.Domain.WeatherForecasts;
 using YourProjectName.Shared.Domain;
 using YourProjectName.Shared.Time;
 
 namespace YourProjectName.Infrastructure.Persistence
 {
-    internal class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IDateTimeProvider dateTimeProvider) 
+    internal class ApplicationDbContext(
+        DbContextOptions<ApplicationDbContext> options, 
+        IDateTimeProvider dateTimeProvider,
+        ICurrentUserService currentUserService) 
         : DbContext(options), IUnitOfWork
     {
         protected override void OnModelCreating(ModelBuilder builder)
@@ -31,10 +35,14 @@ namespace YourProjectName.Infrastructure.Persistence
             var entitiesBeignCreated = ChangeTracker.Entries<AuditableEntity>()
                 .Where(entry => entry.State == EntityState.Added);
 
+            string createdBy = currentUserService.IsCurrentUserAuthenticated() 
+                ? currentUserService.GetCurrentUserId() 
+                : "system";
+
             foreach (var entry in entitiesBeignCreated)
             {
                 entry.Entity.CreatedAtUtc = dateTimeProvider.UtcNow;
-                entry.Entity.CreatedBy = "system";
+                entry.Entity.CreatedBy = createdBy;
             }
         }
 
@@ -43,10 +51,14 @@ namespace YourProjectName.Infrastructure.Persistence
             var entitiesBeignUpdated = ChangeTracker.Entries<AuditableEntity>()
                 .Where(entry => entry.State == EntityState.Modified);
 
+            string updatedBy = currentUserService.IsCurrentUserAuthenticated()
+                ? currentUserService.GetCurrentUserId()
+                : "system";
+
             foreach (var entry in entitiesBeignUpdated)
             {
                 entry.Entity.UpdatedAtUtc = dateTimeProvider.UtcNow;
-                entry.Entity.UpdatedBy = "system";
+                entry.Entity.UpdatedBy = updatedBy;
             }
         }
 

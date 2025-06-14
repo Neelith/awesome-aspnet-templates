@@ -47,7 +47,8 @@ public class WeatherForecastsEndpoints : IEndpoints
         })
             .Produces<CreateWeatherForecastResponse>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest)
-            .ProducesProblem(StatusCodes.Status500InternalServerError);
+            .ProducesProblem(StatusCodes.Status500InternalServerError)
+            .RequireAuthorization();
 
         group.MapGet("", async
             ([AsParameters] GetWeatherForecastsQuery query,

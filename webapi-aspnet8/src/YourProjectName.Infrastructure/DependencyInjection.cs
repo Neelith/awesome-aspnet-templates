@@ -4,6 +4,7 @@ using YourProjectName.Infrastructure.Caching;
 using YourProjectName.Infrastructure.Persistence;
 using YourProjectName.Infrastructure.Persistence.Repositories;
 using YourProjectName.Infrastructure.Time;
+using YourProjectName.Infrastructure.User;
 
 namespace YourProjectName.Infrastructure;
 
@@ -21,7 +22,8 @@ public static class DependencyInjection
         services.AddTime()
                 .AddDbContext(dbConnectionString)
                 .AddRepositories()
-                .AddRedis(redisSettings, logger);
+                .AddRedis(redisSettings, logger)
+                .AddCurrentUserService();
 
         return services;
     }
