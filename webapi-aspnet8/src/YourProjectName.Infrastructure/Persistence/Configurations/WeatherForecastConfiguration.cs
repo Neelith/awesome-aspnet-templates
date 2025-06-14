@@ -8,6 +8,8 @@ namespace YourProjectName.Infrastructure.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<WeatherForecast> builder)
         {
+            builder.ConfigureAuditableEntity();
+
             builder.ToTable("Forecasts").HasKey(c => c.Id);
 
             builder.Property(c => c.Id)

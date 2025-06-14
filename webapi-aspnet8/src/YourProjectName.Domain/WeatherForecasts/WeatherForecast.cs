@@ -4,7 +4,7 @@ using YourProjectName.Shared.Results;
 
 namespace YourProjectName.Domain.WeatherForecasts;
 
-public class WeatherForecast : Entity
+public class WeatherForecast : AuditableEntity
 {
     public int Id { get; private set; }
     public DateOnly Date { get; private set; }
