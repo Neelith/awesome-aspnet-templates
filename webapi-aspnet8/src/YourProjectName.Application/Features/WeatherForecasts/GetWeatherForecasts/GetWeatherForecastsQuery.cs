@@ -2,7 +2,8 @@
 
 namespace YourProjectName.Application.Features.WeatherForecasts.GetWeatherForecasts;
 
-public sealed record GetWeatherForecastsQuery(
-    int? TemperatureRangeMin,
-    int? TemperatureRangeMax)
-    : IQuery<GetWeatherForecastsResponse>;
+public sealed class GetWeatherForecastsQuery : IQuery<GetWeatherForecastsResponse>
+{
+    public int? TemperatureRangeMin { get; set; }
+    public int? TemperatureRangeMax { get; set; }
+}

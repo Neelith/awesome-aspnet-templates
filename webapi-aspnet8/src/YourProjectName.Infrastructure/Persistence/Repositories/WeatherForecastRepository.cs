@@ -2,6 +2,7 @@
 using YourProjectName.Domain.WeatherForecasts;
 using YourProjectName.Domain.WeatherForecasts.Repositories.WeatherForecastRepository;
 using YourProjectName.Domain.WeatherForecasts.Repositories.WeatherForecastRepository.Commands;
+using YourProjectName.Domain.WeatherForecasts.Repositories.WeatherForecastRepository.Queries;
 using YourProjectName.Shared.Results;
 
 namespace YourProjectName.Infrastructure.Persistence.Repositories;
@@ -22,18 +23,18 @@ internal class WeatherForecastRepository(ApplicationDbContext applicationDbConte
         return weatherForecast;
     }
 
-    public async Task<List<WeatherForecast>> GetWeatherForecasts(int? temperatureRangeMin, int? temperatureRangeMax, CancellationToken cancellationToken)
+    public async Task<List<WeatherForecast>> GetWeatherForecasts(GetWeatherForecastsRepositoryQuery? repositoryQuery, CancellationToken cancellationToken)
     {
         var query = applicationDbContext.Forecasts.AsNoTracking();
 
-        if (temperatureRangeMin.HasValue)
+        if (repositoryQuery is not null && repositoryQuery.TemperatureRangeMin.HasValue)
         {
-            query = query.Where(x => x.TemperatureC >= temperatureRangeMin.Value);
+            query = query.Where(x => x.TemperatureC >= repositoryQuery.TemperatureRangeMin.Value);
         }
 
-        if (temperatureRangeMax.HasValue)
+        if (repositoryQuery is not null && repositoryQuery.TemperatureRangeMax.HasValue)
         {
-            query = query.Where(x => x.TemperatureC <= temperatureRangeMax.Value);
+            query = query.Where(x => x.TemperatureC <= repositoryQuery.TemperatureRangeMax.Value);
         }
 
         return await query.ToListAsync(cancellationToken);

@@ -10,8 +10,4 @@
     <ProjectReference Include="..\YourProjectName.Shared\YourProjectName.Shared.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="WeatherForecasts\Repositories\WeatherForecastRepository\Queries\" />
-  </ItemGroup>
-
 </Project>

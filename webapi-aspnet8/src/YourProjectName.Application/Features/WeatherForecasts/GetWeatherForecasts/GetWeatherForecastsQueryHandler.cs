@@ -2,6 +2,7 @@
 using YourProjectName.Application.Infrastructure.Handlers;
 using YourProjectName.Domain.WeatherForecasts;
 using YourProjectName.Domain.WeatherForecasts.Repositories.WeatherForecastRepository;
+using YourProjectName.Domain.WeatherForecasts.Repositories.WeatherForecastRepository.Queries;
 using YourProjectName.Shared.Results;
 
 namespace YourProjectName.Application.Features.WeatherForecasts.GetWeatherForecasts;
@@ -22,8 +23,11 @@ public sealed class GetWeatherForecastsQueryHandler(
             return new GetWeatherForecastsResponse(cachedForecasts);
         }
 
-        var forecasts = await weatherForecastRepository
-            .GetWeatherForecasts(query?.TemperatureRangeMin, query?.TemperatureRangeMax, cancellationToken);
+        var forecasts = await weatherForecastRepository.GetWeatherForecasts(new GetWeatherForecastsRepositoryQuery 
+        {
+            TemperatureRangeMin = query?.TemperatureRangeMin,
+            TemperatureRangeMax = query?.TemperatureRangeMax
+        }, cancellationToken);
 
         var response = new GetWeatherForecastsResponse(forecasts);
 
