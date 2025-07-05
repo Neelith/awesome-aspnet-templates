@@ -21,7 +21,7 @@ namespace YourProjectName.Infrastructure.Persistence
             builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         }
 
-        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken)
         {
             SetAuditablePropertiesOnCreatedEntities();
 
@@ -62,7 +62,7 @@ namespace YourProjectName.Infrastructure.Persistence
             }
         }
 
-        public async Task BeginTransactionAsync(CancellationToken cancellationToken = default)
+        public async Task BeginTransactionAsync(CancellationToken cancellationToken)
         {
             if (Database.CurrentTransaction is not null)
             {
@@ -72,7 +72,7 @@ namespace YourProjectName.Infrastructure.Persistence
             await Database.BeginTransactionAsync(cancellationToken);
         }
 
-        public async Task CommitTransactionAsync(CancellationToken cancellationToken = default)
+        public async Task CommitTransactionAsync(CancellationToken cancellationToken)
         {
             if (Database.CurrentTransaction is null)
             {
@@ -82,7 +82,7 @@ namespace YourProjectName.Infrastructure.Persistence
             await Database.CurrentTransaction.CommitAsync(cancellationToken);
         }
 
-        public async Task RollbackTransactionAsync(CancellationToken cancellationToken = default)
+        public async Task RollbackTransactionAsync(CancellationToken cancellationToken)
         {
             if (Database.CurrentTransaction is null)
             {
