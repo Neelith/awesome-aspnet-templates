@@ -52,7 +52,7 @@ internal static class AddOpenApiExtension
 
     public static void UseOpenApi(this WebApplication app)
     {
-        if (app.Environment.IsDevelopment())
+        if (app.Environment.IsDevelopment() || app.Environment.EnvironmentName == "Local")
         {
             app.UseSwagger();
             app.UseSwaggerUI();
