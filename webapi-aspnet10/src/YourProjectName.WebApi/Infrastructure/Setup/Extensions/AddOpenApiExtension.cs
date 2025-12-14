@@ -5,8 +5,6 @@ namespace YourProjectName.WebApi.Infrastructure.Setup.Extensions;
 
 internal static class AddOpenApiExtension
 {
-    // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-
     public static IServiceCollection AddOpenApiServices(this IServiceCollection services, JwtSettings jwtSettings)
     {
         services.AddEndpointsApiExplorer();
