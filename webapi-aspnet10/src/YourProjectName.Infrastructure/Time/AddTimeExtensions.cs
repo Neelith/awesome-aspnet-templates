@@ -2,6 +2,7 @@
 using YourProjectName.Shared.Time;
 
 namespace YourProjectName.Infrastructure.Time;
+
 internal static class AddTimeExtensions
 {
     public static IServiceCollection AddTime(this IServiceCollection services)

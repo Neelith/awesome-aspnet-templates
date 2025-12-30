@@ -1,18 +1,16 @@
 ﻿using YourProjectName.Application.Infrastructure.Caching;
-using YourProjectName.Application.Infrastructure.Handlers;
 using YourProjectName.Domain.WeatherForecasts;
 using YourProjectName.Domain.WeatherForecasts.Repositories.WeatherForecastRepository;
 using YourProjectName.Domain.WeatherForecasts.Repositories.WeatherForecastRepository.Queries;
-using YourProjectName.Shared.Results;
 
 namespace YourProjectName.Application.Features.WeatherForecasts.GetWeatherForecasts;
 
 public sealed class GetWeatherForecastsQueryHandler(
     IWeatherForecastRepository weatherForecastRepository,
     IRedisCache redisCache)
-    : IQueryHandler<GetWeatherForecastsQuery, GetWeatherForecastsResponse>
+    : IQueryHandler<GetWeatherForecastsQuery, PagedResponse<WeatherForecast>>
 {
-    public async Task<Result<GetWeatherForecastsResponse>> Handle(GetWeatherForecastsQuery? query, CancellationToken cancellationToken)
+    public async Task<Result<PagedResponse<WeatherForecast>>> Handle(GetWeatherForecastsQuery? query, CancellationToken cancellationToken)
     {
         const string cacheKey = "weatherforecasts";
 
@@ -20,16 +18,23 @@ public sealed class GetWeatherForecastsQueryHandler(
 
         if (cachedForecasts is not null)
         {
-            return new GetWeatherForecastsResponse(cachedForecasts);
+            return PagedResponse<WeatherForecast>.Create(cachedForecasts, cachedForecasts.Count);
         }
 
-        var forecasts = await weatherForecastRepository.GetWeatherForecasts(new GetWeatherForecastsRepositoryQuery 
+        var getWeatherForecastsResult = await weatherForecastRepository.GetWeatherForecasts(new GetWeatherForecastsRepositoryQuery
         {
             TemperatureRangeMin = query?.TemperatureRangeMin,
             TemperatureRangeMax = query?.TemperatureRangeMax
         }, cancellationToken);
 
-        var response = new GetWeatherForecastsResponse(forecasts);
+        if (getWeatherForecastsResult.IsFailure)
+        {
+            return Result.Ko<PagedResponse<WeatherForecast>>(getWeatherForecastsResult.Errors, getWeatherForecastsResult.Metadata);
+        }
+
+        var forecasts = getWeatherForecastsResult.Value;
+
+        var response = PagedResponse<WeatherForecast>.Create(forecasts, forecasts.Count);
 
         await redisCache.SetAsync(cacheKey, forecasts, TimeSpan.FromMinutes(2), cancellationToken);
 

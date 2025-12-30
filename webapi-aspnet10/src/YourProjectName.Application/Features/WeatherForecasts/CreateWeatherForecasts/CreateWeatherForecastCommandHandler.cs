@@ -1,24 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using YourProjectName.Application.Infrastructure.Handlers;
+﻿using Microsoft.Extensions.Logging;
 using YourProjectName.Application.Infrastructure.Persistance;
-using YourProjectName.Domain.WeatherForecasts;
 using YourProjectName.Domain.WeatherForecasts.Repositories.WeatherForecastRepository;
 using YourProjectName.Domain.WeatherForecasts.Repositories.WeatherForecastRepository.Commands;
-using YourProjectName.Shared.Results;
 
 namespace YourProjectName.Application.Features.WeatherForecasts.CreateWeatherForecasts;
+
 public sealed class CreateWeatherForecastCommandHandler(
     ILogger<CreateWeatherForecastCommandHandler> logger,
     IWeatherForecastRepository weatherForecastRepository,
-    IUnitOfWork unitOfWork) 
-    : ICommandHandler<CreateWeatherForecastCommand, CreateWeatherForecastResponse>
+    IUnitOfWork unitOfWork)
+    : ICommandHandler<CreateWeatherForecastCommand, IdResponse<int>>
 {
-    public async Task<Result<CreateWeatherForecastResponse>> Handle(CreateWeatherForecastCommand command, CancellationToken cancellationToken)
+    public async Task<Result<IdResponse<int>>> Handle(CreateWeatherForecastCommand command, CancellationToken cancellationToken)
     {
         try
         {
@@ -31,15 +24,12 @@ public sealed class CreateWeatherForecastCommandHandler(
 
             if (createWeatherForecastResult.IsFailure)
             {
-                return createWeatherForecastResult.ToFailedOf<CreateWeatherForecastResponse>();
+                return Result.Ko<IdResponse<int>>(createWeatherForecastResult.Errors, createWeatherForecastResult.Metadata);
             }
 
             await unitOfWork.SaveChangesAsync(cancellationToken);
 
-            return new CreateWeatherForecastResponse
-            {
-                Id = createWeatherForecastResult.Value.Id
-            };
+            return IdResponse<int>.Create(createWeatherForecastResult.Value!.Id);
         }
         catch (Exception e)
         {

@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using YourProjectName.Shared.Domain;
 
 namespace YourProjectName.Infrastructure.Persistence.Configurations;
+
 internal static class AuditableEntityExtensions
 {
     public static void ConfigureAuditableEntity<TEntity>(this EntityTypeBuilder<TEntity> builder)

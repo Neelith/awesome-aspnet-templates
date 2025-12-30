@@ -1,4 +1,5 @@
 ﻿namespace YourProjectName.Application.Infrastructure.Caching;
+
 public interface IRedisCache
 {
     Task<T?> GetAsync<T>(string key, CancellationToken cancellationToken = default);

@@ -1,6 +1,4 @@
-﻿using FluentValidation;
-
-namespace YourProjectName.Application.Features.WeatherForecasts.GetWeatherForecasts;
+﻿namespace YourProjectName.Application.Features.WeatherForecasts.GetWeatherForecasts;
 
 public sealed class GetWeatherForecastsQueryValidator : AbstractValidator<GetWeatherForecastsQuery>
 {

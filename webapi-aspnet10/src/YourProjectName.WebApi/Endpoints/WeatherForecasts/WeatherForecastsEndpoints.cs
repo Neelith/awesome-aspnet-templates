@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Hermes.Responses;
+using Microsoft.AspNetCore.Mvc;
 using YourProjectName.Application.Features.WeatherForecasts.CreateWeatherForecasts;
 using YourProjectName.Application.Features.WeatherForecasts.GetWeatherForecasts;
-using YourProjectName.Application.Infrastructure.Handlers;
-using YourProjectName.Shared.Results;
+using YourProjectName.Domain.WeatherForecasts;
 using YourProjectName.WebApi.Constants;
 using YourProjectName.WebApi.Infrastructure.Extensions;
 
@@ -18,33 +18,39 @@ public class WeatherForecastsEndpoints : IEndpoints
 
         group.MapGet("", async
             ([AsParameters] GetWeatherForecastsQuery query,
-            [FromServices] IQueryHandler<GetWeatherForecastsQuery, GetWeatherForecastsResponse> handler,
+            [FromServices] IQueryHandler<GetWeatherForecastsQuery, PagedResponse<WeatherForecast>> handler,
             CancellationToken cancellationToken) =>
         {
             var result = await handler.Handle(query, cancellationToken);
 
-            return result.Match(
-                result => TypedResults.Ok(result.Value),
-                result => result.ToErrorResponse()
-            );
+            IResult response = result.IsSuccess 
+                ? TypedResults.Ok(result.Value)
+                : result.ToErrorResponse();
+
+            return response;
         })
-        .Produces<GetWeatherForecastsResponse>(StatusCodes.Status200OK)
+        .WithDescription("Retrieves a list of weather forecasts based on the provided query parameters.")
+        .Produces<PagedResponse<WeatherForecast>>(StatusCodes.Status200OK)
+        .ProducesProblem(StatusCodes.Status401Unauthorized)
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .ProducesProblem(StatusCodes.Status500InternalServerError)
         .RequireAuthorization();
 
         group.MapPost("", async
-            ([FromBody] CreateWeatherForecastCommand command, 
-            [FromServices] ICommandHandler<CreateWeatherForecastCommand, CreateWeatherForecastResponse> handler) =>
+            ([FromBody] CreateWeatherForecastCommand command,
+            [FromServices] ICommandHandler<CreateWeatherForecastCommand, IdResponse<int>> handler) =>
         {
             var result = await handler.Handle(command, CancellationToken.None);
 
-            return result.Match(
-                result => TypedResults.Created($"weatherforecasts/{result.Value.Id}", result.Value),
-                result => result.ToErrorResponse()
-            );
+            IResult response = result.IsSuccess
+                ? TypedResults.Created($"weatherforecasts/{result.Value?.Data.Id}", result.Value)
+                : result.ToErrorResponse();
+
+            return response;
         })
-        .Produces<CreateWeatherForecastResponse>(StatusCodes.Status201Created)
+        .WithDescription("Creates a new weather forecast with the provided details.")
+        .Produces<IdResponse<int>>(StatusCodes.Status201Created)
+        .ProducesProblem(StatusCodes.Status401Unauthorized)
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .ProducesProblem(StatusCodes.Status500InternalServerError)
         .RequireAuthorization();

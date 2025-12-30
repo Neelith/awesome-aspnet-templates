@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace YourProjectName.Domain.WeatherForecasts.Repositories.WeatherForecastRepository.Commands;
 
-namespace YourProjectName.Domain.WeatherForecasts.Repositories.WeatherForecastRepository.Commands;
 public class CreateWeatherForecastRepositoryCommand
 {
     public DateTime Date { get; set; }

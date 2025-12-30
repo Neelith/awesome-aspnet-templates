@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Options;
-using YourProjectName.WebApi.Infrastructure.Settings;
+﻿using YourProjectName.WebApi.Infrastructure.Settings;
 
 namespace YourProjectName.WebApi.Infrastructure.Setup.Extensions;
 
@@ -19,8 +18,8 @@ internal static class AddOpenApiExtension
         if (app.Environment.IsDevelopment() || app.Environment.EnvironmentName == "Local")
         {
             app.MapOpenApi();
-            
-            app.UseSwaggerUI(options => 
+
+            app.UseSwaggerUI(options =>
             {
                 options.SwaggerEndpoint("/openapi/v1.json", "v1");
                 options.RoutePrefix = "openapi";

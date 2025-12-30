@@ -1,7 +1,6 @@
-﻿using YourProjectName.Application.Infrastructure.Handlers;
+﻿namespace YourProjectName.Application.Features.WeatherForecasts.CreateWeatherForecasts;
 
-namespace YourProjectName.Application.Features.WeatherForecasts.CreateWeatherForecasts;
-public class CreateWeatherForecastCommand : ICommand<CreateWeatherForecastResponse>
+public class CreateWeatherForecastCommand : ICommand<IdResponse<int>>
 {
     public DateTime Date { get; set; }
     public int TemperatureC { get; set; }

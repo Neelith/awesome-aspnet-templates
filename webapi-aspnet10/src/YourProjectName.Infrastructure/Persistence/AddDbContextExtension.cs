@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using YourProjectName.Application.Infrastructure.Persistance;
 
 namespace YourProjectName.Infrastructure.Persistence;
+
 internal static class AddDbContextExtension
 {
     public static IServiceCollection AddDbContext(this IServiceCollection services, string? connectionString)

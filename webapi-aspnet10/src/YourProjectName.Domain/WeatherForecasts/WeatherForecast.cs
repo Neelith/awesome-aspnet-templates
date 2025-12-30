@@ -1,6 +1,5 @@
 ﻿using System.Text.Json.Serialization;
 using YourProjectName.Shared.Domain;
-using YourProjectName.Shared.Results;
 
 namespace YourProjectName.Domain.WeatherForecasts;
 
@@ -37,9 +36,9 @@ public class WeatherForecast : AuditableEntity
 
         var summaryCreationResult = isSummaryValorized ? Summary.Create(summaryValue!) : null;
 
-        if (summaryCreationResult is { IsFailure: true })
+        if (summaryCreationResult?.IsFailure is true)
         {
-            return Result.Fail<WeatherForecast>(summaryCreationResult.Error);
+            return Result.Ko<WeatherForecast>(summaryCreationResult.Errors, summaryCreationResult.Metadata);
         }
 
         return new WeatherForecast(date, temperatureC, isSummaryValorized ? summaryCreationResult!.Value : null);

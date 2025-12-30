@@ -1,4 +1,5 @@
 ﻿namespace YourProjectName.Shared.Domain;
+
 public class AuditableEntity : Entity
 {
     public bool Deleted { get; set; }

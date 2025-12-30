@@ -1,7 +1,5 @@
 ﻿using System.Reflection;
 using Carter;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using YourProjectName.WebApi.Endpoints;
 
 namespace YourProjectName.WebApi.Infrastructure.Setup.Extensions;
 

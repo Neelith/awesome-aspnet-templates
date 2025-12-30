@@ -1,6 +1,5 @@
 ﻿using System.Reflection;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 using YourProjectName.Application.Infrastructure.Persistance;
 using YourProjectName.Application.Infrastructure.User;
 using YourProjectName.Domain.WeatherForecasts;
@@ -10,9 +9,9 @@ using YourProjectName.Shared.Time;
 namespace YourProjectName.Infrastructure.Persistence
 {
     internal class ApplicationDbContext(
-        DbContextOptions<ApplicationDbContext> options, 
+        DbContextOptions<ApplicationDbContext> options,
         IDateTimeProvider dateTimeProvider,
-        ICurrentUserService currentUserService) 
+        ICurrentUserService currentUserService)
         : DbContext(options), IUnitOfWork
     {
         protected override void OnModelCreating(ModelBuilder builder)
@@ -35,8 +34,8 @@ namespace YourProjectName.Infrastructure.Persistence
             var entitiesBeignCreated = ChangeTracker.Entries<AuditableEntity>()
                 .Where(entry => entry.State == EntityState.Added);
 
-            string createdBy = currentUserService.IsCurrentUserAuthenticated() 
-                ? currentUserService.GetCurrentUserId() 
+            string createdBy = currentUserService.IsCurrentUserAuthenticated()
+                ? currentUserService.GetCurrentUserId()
                 : "system";
 
             foreach (var entry in entitiesBeignCreated)

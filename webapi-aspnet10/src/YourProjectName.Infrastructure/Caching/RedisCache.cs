@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using YourProjectName.Application.Infrastructure.Caching;
 
 namespace YourProjectName.Infrastructure.Caching;
+
 internal class RedisCache(
     IDistributedCache distributedCache,
     ILogger<RedisCache> logger)

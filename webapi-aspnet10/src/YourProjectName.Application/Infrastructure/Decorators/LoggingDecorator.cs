@@ -1,8 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
-using YourProjectName.Application.Infrastructure.Handlers;
-using YourProjectName.Shared.Results;
 
 namespace YourProjectName.Application.Infrastructure.Decorators;
+
 internal static class LoggingDecorator
 {
     internal sealed class CommandBaseHandler<TCommand>(
@@ -22,14 +21,12 @@ internal static class LoggingDecorator
             }
             else
             {
-                var errors = result.Error is ValidationError validationError
-                  ? string.Join(", ", validationError.Errors.Select(e => e.Description))
-                  : result.Error.Description;
+                var errors = result.Errors.Count > 0
+                  ? string.Join(", ", result.Errors.Select(e => e.Message))
+                  : "Unknown error";
 
-                logger.LogError("Completed command {CommandName} with one or more errors. Error code: {ErrorCode}. Error type: {ErrorType}. Errors: {Errors}",
+                logger.LogError("Completed command {CommandName} with one or more errors. Errors: {Errors}",
                     typeof(TCommand).Name,
-                    result.Error.Code,
-                    result.Error.Type,
                     errors);
             }
 
@@ -40,7 +37,9 @@ internal static class LoggingDecorator
     internal sealed class CommandHandler<TCommand, TResponse>(
         ICommandHandler<TCommand, TResponse> inner,
         ILogger<CommandHandler<TCommand, TResponse>> logger)
-        : ICommandHandler<TCommand, TResponse> where TCommand : ICommand<TResponse>
+        : ICommandHandler<TCommand, TResponse>
+        where TCommand : ICommand<TResponse>
+        where TResponse : IResponse
     {
         public async Task<Result<TResponse>> Handle(TCommand command, CancellationToken cancellationToken)
         {
@@ -54,14 +53,12 @@ internal static class LoggingDecorator
             }
             else
             {
-                var errors = result.Error is ValidationError validationError
-                   ? string.Join(", ", validationError.Errors.Select(e => e.Description))
-                   : result.Error.Description;
+                var errors = result.Errors.Count > 0
+                   ? string.Join(", ", result.Errors.Select(e => e.Message))
+                   : "Unknown error";
 
-                logger.LogError("Completed command {CommandName} with one or more errors. Error code: {ErrorCode}. Error type: {ErrorType}. Errors: {Errors}",
+                logger.LogError("Completed command {CommandName} with one or more errors. Errors: {Errors}",
                     typeof(TCommand).Name,
-                    result.Error.Code,
-                    result.Error.Type,
                     errors);
             }
 
@@ -72,11 +69,13 @@ internal static class LoggingDecorator
     internal sealed class QueryHandler<TQuery, TResponse>(
         IQueryHandler<TQuery, TResponse> inner,
         ILogger<QueryHandler<TQuery, TResponse>> logger)
-        : IQueryHandler<TQuery, TResponse> where TQuery : IQuery<TResponse>
+        : IQueryHandler<TQuery, TResponse>
+        where TQuery : IQuery<TResponse>
+        where TResponse : IResponse
     {
         public async Task<Result<TResponse>> Handle(TQuery query, CancellationToken cancellationToken)
         {
-            logger.LogInformation("Processing query {Query}", query);
+            logger.LogInformation("Processing query {QueryName}", typeof(TQuery).Name);
 
             Result<TResponse> result = await inner.Handle(query, cancellationToken);
 
@@ -86,14 +85,12 @@ internal static class LoggingDecorator
             }
             else
             {
-                var errors = result.Error is ValidationError validationError
-                    ? string.Join(", ", validationError.Errors.Select(e => e.Description))
-                    : result.Error.Description;
+                var errors = result.Errors.Count > 0
+                    ? string.Join(", ", result.Errors.Select(e => e.Message))
+                    : "Unknown error";
 
-                logger.LogError("Completed query {QueryName} with one or more errors. Error code: {ErrorCode}. Error type: {ErrorType}. Errors: {Errors}",
+                logger.LogError("Completed query {QueryName} with one or more errors. Errors: {Errors}",
                     typeof(TQuery).Name,
-                    result.Error.Code,
-                    result.Error.Type,
                     errors);
             }
 

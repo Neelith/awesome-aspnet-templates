@@ -1,8 +1,5 @@
-﻿using FluentValidation;
-using Microsoft.Extensions.DependencyInjection;
-using YourProjectName.Application.Infrastructure.Decorators;
+﻿using Microsoft.Extensions.DependencyInjection;
 using YourProjectName.Application.Infrastructure.Handlers;
-using YourProjectName.Shared.Domain;
 
 namespace YourProjectName.Application;
 

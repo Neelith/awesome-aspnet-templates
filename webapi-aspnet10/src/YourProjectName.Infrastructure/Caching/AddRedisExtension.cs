@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using YourProjectName.Application.Infrastructure.Caching;
 
 namespace YourProjectName.Infrastructure.Caching;
+
 internal static class AddRedisExtension
 {
     public static IServiceCollection AddRedis(

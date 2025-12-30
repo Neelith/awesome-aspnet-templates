@@ -1,17 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using YourProjectName.Application.Infrastructure.User;
 
 namespace YourProjectName.Infrastructure.User;
+
 internal class CurrentUserService(
-    ILogger<CurrentUserService> logger, 
-    IHttpContextAccessor httpContextAccessor) 
+    ILogger<CurrentUserService> logger,
+    IHttpContextAccessor httpContextAccessor)
     : ICurrentUserService
 {
     public string GetCurrentUserId()

@@ -1,7 +1,8 @@
 ﻿using System.Text.Json.Serialization;
-using YourProjectName.Shared.Results;
+using ResultExtensions = YourProjectName.Shared.Results.ResultExtensions;
 
 namespace YourProjectName.Domain.WeatherForecasts;
+
 public record Summary
 {
     public string Value { get; private set; }
@@ -16,12 +17,12 @@ public record Summary
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            return Result.Fail<Summary>(SummaryErrors.NullOrEmpty);
+            return ResultExtensions.BadRequest<Summary>([SummaryErrors.NullOrEmpty]);
         }
 
         if (value.Length > 256)
         {
-            return Result.Fail<Summary>(SummaryErrors.SummaryTooLong);
+            return ResultExtensions.BadRequest<Summary>([SummaryErrors.SummaryTooLong]);
         }
 
         return Result.Ok(new Summary(value));

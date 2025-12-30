@@ -31,7 +31,7 @@ internal static class DependencyInjection
             ?? throw new ApplicationException("Configuration section 'RedisSettings' not found.");
 
         //Add the jwt settings to the container and get an istance of it
-        JwtSettings jwtSettings = services.AddSettings<JwtSettings>(configuration, startupLogger) 
+        JwtSettings jwtSettings = services.AddSettings<JwtSettings>(configuration, startupLogger)
             ?? throw new ApplicationException("Configuration section 'JwtSettings' not found.");
 
         //Register services here

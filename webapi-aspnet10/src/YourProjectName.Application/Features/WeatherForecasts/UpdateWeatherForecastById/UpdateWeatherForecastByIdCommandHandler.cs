@@ -1,7 +1,4 @@
-﻿using YourProjectName.Application.Infrastructure.Handlers;
-using YourProjectName.Shared.Results;
-
-namespace YourProjectName.Application.Features.WeatherForecasts.UpdateWeatherForecastById;
+﻿namespace YourProjectName.Application.Features.WeatherForecasts.UpdateWeatherForecastById;
 
 public sealed class UpdateWeatherForecastByIdCommandHandler()
     : ICommandHandler<UpdateWeatherForecastByIdCommand>

@@ -1,6 +1,4 @@
-﻿using FluentValidation;
-
-namespace YourProjectName.Application.Features.WeatherForecasts.DeleteWeatherForecastById;
+﻿namespace YourProjectName.Application.Features.WeatherForecasts.DeleteWeatherForecastById;
 
 public sealed class DeleteWeatherForecastByIdCommandValidator : AbstractValidator<DeleteWeatherForecastByIdCommand>
 {

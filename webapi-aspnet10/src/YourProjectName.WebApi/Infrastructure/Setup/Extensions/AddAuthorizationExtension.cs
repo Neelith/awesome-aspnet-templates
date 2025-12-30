@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-
-namespace YourProjectName.WebApi.Infrastructure.Setup.Extensions;
+﻿namespace YourProjectName.WebApi.Infrastructure.Setup.Extensions;
 
 public static class AddAuthorizationExtension
 {
