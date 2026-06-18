@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+  </Folder>
+  <Project Path="docker-compose.dcproj">
+    <Build />
+  </Project>
+  <Project Path="YourProjectName.Application/YourProjectName.Application.csproj" />
+  <Project Path="YourProjectName.Domain/YourProjectName.Domain.csproj" />
+  <Project Path="YourProjectName.Infrastructure/YourProjectName.Infrastructure.csproj" />
+  <Project Path="YourProjectName.Shared/YourProjectName.Shared.csproj" />
+  <Project Path="YourProjectName.WebApi/YourProjectName.WebApi.csproj" />
+</Solution>
