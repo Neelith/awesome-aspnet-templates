@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using YourProjectName.Core.Abstractions.Caching;
 using YourProjectName.Core.Abstractions.Persistence;
 using YourProjectName.Core.Services.Time;
 using YourProjectName.Core.Services.User;
@@ -27,25 +27,20 @@ public static class DependencyInjection
         services.AddTime()
                 .AddDbContext(dbConnectionString)
                 .AddRepositories()
-                .AddRedis(redisSettings, logger)
+                .AddCaching(redisSettings, logger)
                 .AddCurrentUserService();
 
         return services;
     }
 
-    public static IServiceCollection AddRedis(
+    public static IServiceCollection AddCaching(
         this IServiceCollection services,
         RedisSettings? redisSettings,
         ILogger logger)
     {
-        //Add redis only if we have a proper connection string configured
-        //Otherwise, use the in-memory cache
-        if (redisSettings is null || string.IsNullOrEmpty(redisSettings.ConnectionString))
-        {
-            logger.LogWarning("Redis settings not found or invalid. Using in-memory cache");
-            services.AddDistributedMemoryCache();
-        }
-        else
+        //Register HybridCache with L2 Redis backend if configured
+        //HybridCache provides L1 in-memory cache automatically
+        if (redisSettings is not null && !string.IsNullOrEmpty(redisSettings.ConnectionString))
         {
             services.AddStackExchangeRedisCache(options =>
             {
@@ -56,8 +51,12 @@ public static class DependencyInjection
                 options.InstanceName = redisSettings.KeyPrefix;
             });
         }
+        else
+        {
+            logger.LogWarning("Redis settings not found or invalid. HybridCache will use L1 in-memory cache only");
+        }
 
-        services.AddSingleton<IRedisCache, RedisCache>();
+        services.AddHybridCache();
 
         return services;
     }

@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Caching.Hybrid;
 using YourProjectName.Core.Abstractions.Caching;
 using YourProjectName.Core.Entities.WeatherForecasts;
 using YourProjectName.Core.Repositories.WeatherForecastRepository;
@@ -7,37 +8,40 @@ namespace YourProjectName.Core.Features.WeatherForecasts.GetWeatherForecasts;
 
 public sealed class GetWeatherForecastsQueryHandler(
     IWeatherForecastRepository weatherForecastRepository,
-    IRedisCache redisCache)
+    HybridCache cache)
     : IQueryHandler<GetWeatherForecastsQuery, PagedResponse<WeatherForecast>>
 {
     public async Task<Result<PagedResponse<WeatherForecast>>> Handle(GetWeatherForecastsQuery? query, CancellationToken cancellationToken)
     {
         const string cacheKey = "weatherforecasts";
 
-        var cachedForecasts = await redisCache.GetAsync<List<WeatherForecast>>(cacheKey, cancellationToken);
-
-        if (cachedForecasts is not null)
+        try
         {
-            return PagedResponse<WeatherForecast>.Create(cachedForecasts, cachedForecasts.Count);
+            var forecasts = await cache.GetOrCreateAsync(
+                cacheKey,
+                async (CancellationToken ct) =>
+                {
+                    var result = await weatherForecastRepository.GetWeatherForecasts(new GetWeatherForecastsRepositoryQuery
+                    {
+                        TemperatureRangeMin = query?.TemperatureRangeMin,
+                        TemperatureRangeMax = query?.TemperatureRangeMax
+                    }, ct);
+
+                    if (result.IsFailure)
+                    {
+                        throw new CacheFactoryException(result.Errors, result.Metadata);
+                    }
+
+                    return result.Value;
+                },
+                new HybridCacheEntryOptions { Expiration = TimeSpan.FromMinutes(2) },
+                cancellationToken: cancellationToken);
+
+            return PagedResponse<WeatherForecast>.Create(forecasts, forecasts.Count);
         }
-
-        var getWeatherForecastsResult = await weatherForecastRepository.GetWeatherForecasts(new GetWeatherForecastsRepositoryQuery
+        catch (CacheFactoryException ex)
         {
-            TemperatureRangeMin = query?.TemperatureRangeMin,
-            TemperatureRangeMax = query?.TemperatureRangeMax
-        }, cancellationToken);
-
-        if (getWeatherForecastsResult.IsFailure)
-        {
-            return Result.Ko<PagedResponse<WeatherForecast>>(getWeatherForecastsResult.Errors, getWeatherForecastsResult.Metadata);
+            return Result.Ko<PagedResponse<WeatherForecast>>(ex.Errors, ex.Metadata);
         }
-
-        var forecasts = getWeatherForecastsResult.Value;
-
-        var response = PagedResponse<WeatherForecast>.Create(forecasts, forecasts.Count);
-
-        await redisCache.SetAsync(cacheKey, forecasts, TimeSpan.FromMinutes(2), cancellationToken);
-
-        return response;
     }
 }

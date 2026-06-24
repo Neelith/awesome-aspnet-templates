@@ -14,8 +14,8 @@ WebApi
 
 | Layer | Project | Responsibility |
 |---|---|---|
-| **Core** | `YourProjectName.Core` | Entities, value objects, CQRS handlers/validators, repository interfaces, decorators, abstractions (`IRedisCache`, `IUnitOfWork`), domain event primitives. No external infrastructure deps. |
-| **Infrastructure** | `YourProjectName.Infrastructure` | EF Core `ApplicationDbContext`, repository implementations, Redis cache, `DateTimeProvider`, `CurrentUserService`. References Core. |
+| **Core** | `YourProjectName.Core` | Entities, value objects, CQRS handlers/validators, repository interfaces, decorators, abstractions (`CacheFactoryException`, `IUnitOfWork`), domain event primitives. No external infrastructure deps. |
+| **Infrastructure** | `YourProjectName.Infrastructure` | EF Core `ApplicationDbContext`, repository implementations, HybridCache (Redis-backed), `DateTimeProvider`, `CurrentUserService`. References Core. |
 | **WebApi** | `YourProjectName.WebApi` | Entry point. Carter endpoints (`IEndpoints`), middleware (`TraceMiddleware`, `GlobalExceptionHandler`), settings (JWT, Redis), OpenAPI, auth/authz, DI composition root. References Core + Infrastructure. |
 
 ### CQRS Pattern
@@ -52,7 +52,7 @@ EF Core with Npgsql (PostgreSQL). Soft delete via `AuditableEntity.Deleted` + gl
 
 ### Caching
 
-Redis via `IRedisCache` interface. Falls back to `IDistributedMemoryCache` if `RedisSettings` not configured. Configured through `RedisSettings` section.
+HybridCache (`HybridCache`) with Redis L2 backend. L1 in-memory cache built-in. Falls back to L1-only if Redis not configured. `RedisSettings` section configures Redis connection. `CacheFactoryException` propagates DB errors from `GetOrCreateAsync` factory.
 
 ### Endpoints
 
@@ -102,7 +102,7 @@ src/
     ValueObjects/        — Value objects with factory methods + validation
     Extensions/          — ResultExtensions (BadRequest, NotFound, etc.)
     Abstractions/
-      Caching/           — IRedisCache interface
+      Caching/           — CacheFactoryException
       Decorators/        — ValidationDecorator, LoggingDecorator (Scrutor)
       Persistence/       — IUnitOfWork interface
     Entities/
@@ -127,7 +127,7 @@ src/
       Repositories/         — Repository implementations + AddRepositoriesExtension
       Migrations/           — EF Core migrations
       AddDatabaseMigrationsExtension.cs
-    Caching/             — RedisCache, RedisSettings
+    Caching/             — RedisSettings
     Time/                — DateTimeProvider
     User/                — CurrentUserService
     DependencyInjection.cs
