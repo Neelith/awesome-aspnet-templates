@@ -1,4 +1,4 @@
-﻿namespace YourProjectName.Domain.WeatherForecasts.Repositories.WeatherForecastRepository.Queries;
+namespace YourProjectName.Core.Repositories.WeatherForecastRepository.Queries;
 
 public class GetWeatherForecastsRepositoryQuery
 {

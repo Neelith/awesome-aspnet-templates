@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using YourProjectName.WebApi.Constants;
 
-namespace YourProjectName.WebApi.Infrastructure.Setup.Middlewares;
+namespace YourProjectName.WebApi.Middlewares;
 
 internal sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger)
     : IExceptionHandler

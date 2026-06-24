@@ -1,13 +1,13 @@
 ﻿using System.Reflection;
-using YourProjectName.Application;
+using YourProjectName.Core;
 using YourProjectName.Infrastructure;
 using YourProjectName.Infrastructure.Caching;
 using YourProjectName.Infrastructure.Persistence;
-using YourProjectName.WebApi.Infrastructure.Settings;
-using YourProjectName.WebApi.Infrastructure.Setup.Extensions;
-using YourProjectName.WebApi.Infrastructure.Setup.Middlewares;
+using YourProjectName.WebApi.DependencyInjectionExtensions;
+using YourProjectName.WebApi.Middlewares;
+using YourProjectName.WebApi.Settings;
 
-namespace YourProjectName.WebApi.Infrastructure.Setup;
+namespace YourProjectName.WebApi;
 
 internal static class DependencyInjection
 {
@@ -42,7 +42,7 @@ internal static class DependencyInjection
             .ConfigureProblemDetails()
             .AddAuthenticationServices(jwtSettings)
             .AddAuthorizationServices()
-            .AddApplicationServices()
+            .AddCoreServices()
             .AddInfrastructureServices(startupLogger, dbConnectionString, redisSettings)
             .AddEndpoints(Assembly.GetExecutingAssembly())
             .AddOpenApiServices(jwtSettings);

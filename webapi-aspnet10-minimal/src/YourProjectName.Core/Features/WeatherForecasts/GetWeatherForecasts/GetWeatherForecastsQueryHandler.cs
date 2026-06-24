@@ -1,9 +1,9 @@
-﻿using YourProjectName.Application.Infrastructure.Caching;
-using YourProjectName.Domain.WeatherForecasts;
-using YourProjectName.Domain.WeatherForecasts.Repositories.WeatherForecastRepository;
-using YourProjectName.Domain.WeatherForecasts.Repositories.WeatherForecastRepository.Queries;
+using YourProjectName.Core.Abstractions.Caching;
+using YourProjectName.Core.Entities.WeatherForecasts;
+using YourProjectName.Core.Repositories.WeatherForecastRepository;
+using YourProjectName.Core.Repositories.WeatherForecastRepository.Queries;
 
-namespace YourProjectName.Application.Features.WeatherForecasts.GetWeatherForecasts;
+namespace YourProjectName.Core.Features.WeatherForecasts.GetWeatherForecasts;
 
 public sealed class GetWeatherForecastsQueryHandler(
     IWeatherForecastRepository weatherForecastRepository,

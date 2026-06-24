@@ -1,4 +1,4 @@
-﻿namespace YourProjectName.Application.Infrastructure.User;
+namespace YourProjectName.Core.Services.User;
 
 public interface ICurrentUserService
 {

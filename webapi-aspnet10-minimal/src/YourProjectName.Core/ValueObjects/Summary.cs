@@ -1,7 +1,9 @@
-﻿using System.Text.Json.Serialization;
-using ResultExtensions = YourProjectName.Shared.Results.ResultExtensions;
+using System.Text.Json.Serialization;
+using YourProjectName.Core.Entities.WeatherForecasts;
+using YourProjectName.Core.Extensions;
+using ResultExtensions = YourProjectName.Core.Extensions.ResultExtensions;
 
-namespace YourProjectName.Domain.WeatherForecasts;
+namespace YourProjectName.Core.ValueObjects;
 
 public record Summary
 {
@@ -25,6 +27,6 @@ public record Summary
             return ResultExtensions.BadRequest<Summary>([SummaryErrors.SummaryTooLong]);
         }
 
-        return Result.Ok(new Summary(value));
+        return Hermes.Results.Result.Ok(new Summary(value));
     }
 }

@@ -1,3 +1,3 @@
-﻿namespace YourProjectName.Shared.Domain;
+namespace YourProjectName.Core.Shared;
 
 public interface IDomainEvent;

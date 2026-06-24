@@ -1,4 +1,4 @@
-﻿namespace YourProjectName.Infrastructure.Caching;
+namespace YourProjectName.Infrastructure.Caching;
 
 public record RedisSettings
 {

@@ -1,4 +1,4 @@
-﻿namespace YourProjectName.Domain.WeatherForecasts;
+namespace YourProjectName.Core.Entities.WeatherForecasts;
 
 public static class WeatherForecastErrors
 {

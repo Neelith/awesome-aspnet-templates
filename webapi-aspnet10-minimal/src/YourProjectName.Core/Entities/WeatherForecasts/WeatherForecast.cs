@@ -1,7 +1,8 @@
-﻿using System.Text.Json.Serialization;
-using YourProjectName.Shared.Domain;
+using System.Text.Json.Serialization;
+using YourProjectName.Core.Shared;
+using YourProjectName.Core.ValueObjects;
 
-namespace YourProjectName.Domain.WeatherForecasts;
+namespace YourProjectName.Core.Entities.WeatherForecasts;
 
 public class WeatherForecast : AuditableEntity
 {

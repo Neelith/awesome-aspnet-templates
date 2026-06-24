@@ -1,10 +1,10 @@
-﻿using System.Reflection;
+using System.Reflection;
 using Microsoft.EntityFrameworkCore;
-using YourProjectName.Application.Infrastructure.Persistance;
-using YourProjectName.Application.Infrastructure.User;
-using YourProjectName.Domain.WeatherForecasts;
-using YourProjectName.Shared.Domain;
-using YourProjectName.Shared.Time;
+using YourProjectName.Core.Abstractions.Persistence;
+using YourProjectName.Core.Entities.WeatherForecasts;
+using YourProjectName.Core.Services.Time;
+using YourProjectName.Core.Services.User;
+using YourProjectName.Core.Shared;
 
 namespace YourProjectName.Infrastructure.Persistence
 {

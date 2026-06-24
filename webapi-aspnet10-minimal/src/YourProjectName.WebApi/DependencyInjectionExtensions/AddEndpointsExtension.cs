@@ -1,7 +1,7 @@
-﻿using System.Reflection;
+using System.Reflection;
 using Carter;
 
-namespace YourProjectName.WebApi.Infrastructure.Setup.Extensions;
+namespace YourProjectName.WebApi.DependencyInjectionExtensions;
 
 internal static class AddEndpointsExtension
 {

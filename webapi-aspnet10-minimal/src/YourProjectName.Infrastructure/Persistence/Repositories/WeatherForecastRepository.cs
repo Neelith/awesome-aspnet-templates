@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
-using YourProjectName.Domain.WeatherForecasts;
-using YourProjectName.Domain.WeatherForecasts.Repositories.WeatherForecastRepository;
-using YourProjectName.Domain.WeatherForecasts.Repositories.WeatherForecastRepository.Commands;
-using YourProjectName.Domain.WeatherForecasts.Repositories.WeatherForecastRepository.Queries;
+using Microsoft.EntityFrameworkCore;
+using YourProjectName.Core.Entities.WeatherForecasts;
+using YourProjectName.Core.Repositories.WeatherForecastRepository;
+using YourProjectName.Core.Repositories.WeatherForecastRepository.Commands;
+using YourProjectName.Core.Repositories.WeatherForecastRepository.Queries;
 
 namespace YourProjectName.Infrastructure.Persistence.Repositories;
 

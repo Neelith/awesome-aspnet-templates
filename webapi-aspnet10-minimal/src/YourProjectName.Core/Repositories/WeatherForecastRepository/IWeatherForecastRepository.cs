@@ -1,8 +1,9 @@
-﻿using Hermes.Results;
-using YourProjectName.Domain.WeatherForecasts.Repositories.WeatherForecastRepository.Commands;
-using YourProjectName.Domain.WeatherForecasts.Repositories.WeatherForecastRepository.Queries;
+using Hermes.Results;
+using YourProjectName.Core.Entities.WeatherForecasts;
+using YourProjectName.Core.Repositories.WeatherForecastRepository.Commands;
+using YourProjectName.Core.Repositories.WeatherForecastRepository.Queries;
 
-namespace YourProjectName.Domain.WeatherForecasts.Repositories.WeatherForecastRepository;
+namespace YourProjectName.Core.Repositories.WeatherForecastRepository;
 
 public interface IWeatherForecastRepository
 {

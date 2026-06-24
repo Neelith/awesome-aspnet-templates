@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using YourProjectName.Shared.Domain;
+using YourProjectName.Core.Shared;
 
-namespace YourProjectName.Infrastructure.Persistence.Configurations;
+namespace YourProjectName.Infrastructure.Persistence.EntityConfigurations;
 
 internal static class AuditableEntityExtensions
 {

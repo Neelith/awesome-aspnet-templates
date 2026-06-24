@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace YourProjectName.Shared.Constants;
+namespace YourProjectName.Core.Constants;
 
 public static class ErrorConsts
 {

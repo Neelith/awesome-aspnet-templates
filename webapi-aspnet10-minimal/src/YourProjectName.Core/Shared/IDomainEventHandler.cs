@@ -1,4 +1,4 @@
-namespace YourProjectName.Shared.Domain;
+namespace YourProjectName.Core.Shared;
 
 public interface IDomainEventHandler<in T> where T : IDomainEvent
 {

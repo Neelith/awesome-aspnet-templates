@@ -1,4 +1,4 @@
-﻿namespace YourProjectName.Application.Features.WeatherForecasts.UpdateWeatherForecastById;
+namespace YourProjectName.Core.Features.WeatherForecasts.UpdateWeatherForecastById;
 
 public sealed class UpdateWeatherForecastByIdCommandValidator : AbstractValidator<UpdateWeatherForecastByIdCommand>
 {

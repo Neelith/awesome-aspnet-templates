@@ -1,6 +1,7 @@
-using YourProjectName.WebApi.Infrastructure.Setup;
+using YourProjectName.WebApi;
 
 // Create the web application builder
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.

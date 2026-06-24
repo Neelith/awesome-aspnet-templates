@@ -1,6 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 
-namespace YourProjectName.Application.Infrastructure.Decorators;
+namespace YourProjectName.Core.Abstractions.Decorators;
 
 internal static class LoggingDecorator
 {

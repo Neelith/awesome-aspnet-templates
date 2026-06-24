@@ -1,6 +1,6 @@
-﻿using YourProjectName.Domain.WeatherForecasts;
+using YourProjectName.Core.Entities.WeatherForecasts;
 
-namespace YourProjectName.Application.Features.WeatherForecasts.GetWeatherForecasts;
+namespace YourProjectName.Core.Features.WeatherForecasts.GetWeatherForecasts;
 
 public sealed class GetWeatherForecastsQuery : IQuery<PagedResponse<WeatherForecast>>
 {

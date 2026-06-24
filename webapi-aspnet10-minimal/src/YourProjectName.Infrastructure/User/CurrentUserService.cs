@@ -1,7 +1,7 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using YourProjectName.Application.Infrastructure.User;
+using YourProjectName.Core.Services.User;
 
 namespace YourProjectName.Infrastructure.User;
 

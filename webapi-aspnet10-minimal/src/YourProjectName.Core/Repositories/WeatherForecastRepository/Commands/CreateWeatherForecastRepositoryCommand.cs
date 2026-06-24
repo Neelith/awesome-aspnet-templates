@@ -1,4 +1,4 @@
-﻿namespace YourProjectName.Domain.WeatherForecasts.Repositories.WeatherForecastRepository.Commands;
+namespace YourProjectName.Core.Repositories.WeatherForecastRepository.Commands;
 
 public class CreateWeatherForecastRepositoryCommand
 {

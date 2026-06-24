@@ -1,6 +1,6 @@
-﻿using YourProjectName.WebApi.Constants;
+using YourProjectName.WebApi.Constants;
 
-namespace YourProjectName.WebApi.Infrastructure.Setup.Extensions;
+namespace YourProjectName.WebApi.DependencyInjectionExtensions;
 
 internal static class AddProblemDetailsExtension
 {

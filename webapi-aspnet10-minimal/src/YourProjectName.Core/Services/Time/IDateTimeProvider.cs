@@ -1,4 +1,4 @@
-﻿namespace YourProjectName.Shared.Time;
+namespace YourProjectName.Core.Services.Time;
 
 public interface IDateTimeProvider
 {

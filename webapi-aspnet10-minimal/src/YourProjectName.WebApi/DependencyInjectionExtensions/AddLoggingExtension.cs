@@ -1,8 +1,8 @@
-﻿using Serilog;
+using Serilog;
 using Serilog.Extensions.Logging;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
-namespace YourProjectName.WebApi.Infrastructure.Setup.Extensions;
+namespace YourProjectName.WebApi.DependencyInjectionExtensions;
 
 public static class AddLoggingExtension
 {

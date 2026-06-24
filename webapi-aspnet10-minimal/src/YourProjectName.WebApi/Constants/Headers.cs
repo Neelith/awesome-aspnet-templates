@@ -1,4 +1,4 @@
-﻿namespace YourProjectName.WebApi.Constants;
+namespace YourProjectName.WebApi.Constants;
 
 public static class Headers
 {

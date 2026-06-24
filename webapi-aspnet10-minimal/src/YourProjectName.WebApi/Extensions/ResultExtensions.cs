@@ -1,8 +1,8 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Http.HttpResults;
-using YourProjectName.Shared.Constants;
+using YourProjectName.Core.Constants;
 
-namespace YourProjectName.WebApi.Infrastructure.Extensions;
+namespace YourProjectName.WebApi.Extensions;
 
 internal static class ResultExtensions
 {

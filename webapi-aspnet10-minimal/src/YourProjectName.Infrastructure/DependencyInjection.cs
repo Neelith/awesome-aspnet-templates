@@ -1,5 +1,10 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using YourProjectName.Core.Abstractions.Caching;
+using YourProjectName.Core.Abstractions.Persistence;
+using YourProjectName.Core.Services.Time;
+using YourProjectName.Core.Services.User;
 using YourProjectName.Infrastructure.Caching;
 using YourProjectName.Infrastructure.Persistence;
 using YourProjectName.Infrastructure.Persistence.Repositories;

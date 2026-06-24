@@ -1,6 +1,6 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 
-namespace YourProjectName.Shared.Domain;
+namespace YourProjectName.Core.Shared;
 
 public abstract class Entity
 {

@@ -1,4 +1,4 @@
-﻿namespace YourProjectName.Application.Features.WeatherForecasts.DeleteWeatherForecastById;
+namespace YourProjectName.Core.Features.WeatherForecasts.DeleteWeatherForecastById;
 
 public sealed class DeleteWeatherForecastByIdCommandHandler()
     : ICommandHandler<DeleteWeatherForecastByIdCommand>

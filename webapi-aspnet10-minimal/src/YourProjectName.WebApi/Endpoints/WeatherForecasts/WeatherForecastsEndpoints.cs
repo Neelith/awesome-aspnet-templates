@@ -1,10 +1,10 @@
-﻿using Hermes.Responses;
+using Hermes.Responses;
 using Microsoft.AspNetCore.Mvc;
-using YourProjectName.Application.Features.WeatherForecasts.CreateWeatherForecasts;
-using YourProjectName.Application.Features.WeatherForecasts.GetWeatherForecasts;
-using YourProjectName.Domain.WeatherForecasts;
+using YourProjectName.Core.Entities.WeatherForecasts;
+using YourProjectName.Core.Features.WeatherForecasts.CreateWeatherForecasts;
+using YourProjectName.Core.Features.WeatherForecasts.GetWeatherForecasts;
 using YourProjectName.WebApi.Constants;
-using YourProjectName.WebApi.Infrastructure.Extensions;
+using YourProjectName.WebApi.Extensions;
 
 namespace YourProjectName.WebApi.Endpoints.WeatherForecasts;
 

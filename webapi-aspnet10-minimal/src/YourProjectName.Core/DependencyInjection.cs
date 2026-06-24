@@ -1,11 +1,11 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using YourProjectName.Application.Infrastructure.Handlers;
+using Microsoft.Extensions.DependencyInjection;
+using YourProjectName.Core.Abstractions.Decorators;
 
-namespace YourProjectName.Application;
+namespace YourProjectName.Core;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddApplicationServices(this IServiceCollection services)
+    public static IServiceCollection AddCoreServices(this IServiceCollection services)
     {
         //Register application services here
         var assembly = typeof(DependencyInjection).Assembly;

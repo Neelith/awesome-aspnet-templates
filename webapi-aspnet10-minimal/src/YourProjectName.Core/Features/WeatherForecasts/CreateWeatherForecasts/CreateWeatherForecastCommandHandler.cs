@@ -1,9 +1,9 @@
-﻿using Microsoft.Extensions.Logging;
-using YourProjectName.Application.Infrastructure.Persistance;
-using YourProjectName.Domain.WeatherForecasts.Repositories.WeatherForecastRepository;
-using YourProjectName.Domain.WeatherForecasts.Repositories.WeatherForecastRepository.Commands;
+using Microsoft.Extensions.Logging;
+using YourProjectName.Core.Abstractions.Persistence;
+using YourProjectName.Core.Repositories.WeatherForecastRepository;
+using YourProjectName.Core.Repositories.WeatherForecastRepository.Commands;
 
-namespace YourProjectName.Application.Features.WeatherForecasts.CreateWeatherForecasts;
+namespace YourProjectName.Core.Features.WeatherForecasts.CreateWeatherForecasts;
 
 public sealed class CreateWeatherForecastCommandHandler(
     ILogger<CreateWeatherForecastCommandHandler> logger,

@@ -1,4 +1,4 @@
-﻿namespace YourProjectName.Application.Infrastructure.Caching;
+namespace YourProjectName.Core.Abstractions.Caching;
 
 public interface IRedisCache
 {

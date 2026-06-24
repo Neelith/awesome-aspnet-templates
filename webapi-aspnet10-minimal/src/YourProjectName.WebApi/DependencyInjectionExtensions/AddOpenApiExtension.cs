@@ -1,6 +1,6 @@
-﻿using YourProjectName.WebApi.Infrastructure.Settings;
+using YourProjectName.WebApi.Settings;
 
-namespace YourProjectName.WebApi.Infrastructure.Setup.Extensions;
+namespace YourProjectName.WebApi.DependencyInjectionExtensions;
 
 internal static class AddOpenApiExtension
 {

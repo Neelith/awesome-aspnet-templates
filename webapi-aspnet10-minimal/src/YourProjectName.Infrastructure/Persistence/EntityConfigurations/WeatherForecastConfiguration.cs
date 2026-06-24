@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using YourProjectName.Domain.WeatherForecasts;
+using YourProjectName.Core.Entities.WeatherForecasts;
 
-namespace YourProjectName.Infrastructure.Persistence.Configurations
+namespace YourProjectName.Infrastructure.Persistence.EntityConfigurations
 {
     public class WeatherForecastConfiguration : IEntityTypeConfiguration<WeatherForecast>
     {

@@ -1,8 +1,8 @@
-﻿using FluentValidation.Results;
-using YourProjectName.Shared.Constants;
+using FluentValidation.Results;
+using YourProjectName.Core.Constants;
 using ValidationResult = FluentValidation.Results.ValidationResult;
 
-namespace YourProjectName.Application.Infrastructure.Decorators;
+namespace YourProjectName.Core.Abstractions.Decorators;
 
 internal static class ValidationDecorator
 {

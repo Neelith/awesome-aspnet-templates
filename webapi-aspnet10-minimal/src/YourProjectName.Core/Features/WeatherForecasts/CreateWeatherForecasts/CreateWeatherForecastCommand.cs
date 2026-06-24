@@ -1,4 +1,4 @@
-﻿namespace YourProjectName.Application.Features.WeatherForecasts.CreateWeatherForecasts;
+namespace YourProjectName.Core.Features.WeatherForecasts.CreateWeatherForecasts;
 
 public class CreateWeatherForecastCommand : ICommand<IdResponse<int>>
 {

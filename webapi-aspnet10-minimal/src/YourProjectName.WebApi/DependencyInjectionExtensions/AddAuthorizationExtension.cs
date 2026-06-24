@@ -1,4 +1,4 @@
-﻿namespace YourProjectName.WebApi.Infrastructure.Setup.Extensions;
+namespace YourProjectName.WebApi.DependencyInjectionExtensions;
 
 public static class AddAuthorizationExtension
 {

@@ -1,7 +1,7 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
-using YourProjectName.Application.Infrastructure.Caching;
+using YourProjectName.Core.Abstractions.Caching;
 
 namespace YourProjectName.Infrastructure.Caching;
 

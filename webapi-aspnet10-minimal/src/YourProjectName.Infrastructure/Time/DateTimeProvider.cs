@@ -1,4 +1,4 @@
-﻿using YourProjectName.Shared.Time;
+using YourProjectName.Core.Services.Time;
 
 namespace YourProjectName.Infrastructure.Time;
 

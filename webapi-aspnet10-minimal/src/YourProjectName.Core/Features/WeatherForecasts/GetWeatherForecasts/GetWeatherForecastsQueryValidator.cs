@@ -1,4 +1,4 @@
-﻿namespace YourProjectName.Application.Features.WeatherForecasts.GetWeatherForecasts;
+namespace YourProjectName.Core.Features.WeatherForecasts.GetWeatherForecasts;
 
 public sealed class GetWeatherForecastsQueryValidator : AbstractValidator<GetWeatherForecastsQuery>
 {

@@ -1,4 +1,4 @@
-﻿namespace YourProjectName.Application.Infrastructure.Persistance;
+namespace YourProjectName.Core.Abstractions.Persistence;
 
 public interface IUnitOfWork
 {
