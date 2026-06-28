@@ -34,6 +34,10 @@ internal static class DependencyInjection
         JwtSettings jwtSettings = services.AddSettings<JwtSettings>(configuration, startupLogger)
             ?? throw new ApplicationException("Configuration section 'JwtSettings' not found.");
 
+        //Add OpenTelemetry
+        bool redisEnabled = redisSettings is not null && !string.IsNullOrEmpty(redisSettings.ConnectionString);
+        webApplicationBuilder.AddTelemetry(redisEnabled);
+
         //Register services here
         services
             .AddRouting(options => options.LowercaseUrls = true)
@@ -53,9 +57,6 @@ internal static class DependencyInjection
     // Configure the HTTP request pipeline.
     public static void UseAppServices(this WebApplication app)
     {
-        //Add x-trace header to all responses
-        app.UseMiddleware<TraceMiddleware>();
-
         //Enable logging
         app.UseLogging();
 

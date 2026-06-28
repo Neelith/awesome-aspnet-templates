@@ -16,7 +16,7 @@ WebApi
 |---|---|---|
 | **Core** | `YourProjectName.Core` | Entities, value objects, CQRS handlers/validators, repository interfaces, decorators, abstractions (`CacheFactoryException`, `IUnitOfWork`), domain event primitives. No external infrastructure deps. |
 | **Infrastructure** | `YourProjectName.Infrastructure` | EF Core `ApplicationDbContext`, repository implementations, HybridCache (Redis-backed), `DateTimeProvider`, `CurrentUserService`. References Core. |
-| **WebApi** | `YourProjectName.WebApi` | Entry point. Carter endpoints (`IEndpoints`), middleware (`TraceMiddleware`, `GlobalExceptionHandler`), settings (JWT, Redis), OpenAPI, auth/authz, DI composition root. References Core + Infrastructure. |
+| **WebApi** | `YourProjectName.WebApi` | Entry point. Carter endpoints (`IEndpoints`), middleware (`GlobalExceptionHandler`), settings (JWT, Redis), OpenAPI, auth/authz, OTel telemetry, DI composition root. References Core + Infrastructure. |
 
 ### CQRS Pattern
 
@@ -34,7 +34,7 @@ Queries for GET operations. Commands for all other HTTP methods.
 
 Handlers wrapped in order:
 1. `ValidationDecorator` — runs FluentValidation, returns `Result.Ko` on failure with `400` metadata
-2. `LoggingDecorator` — logs before/after execution with errors on failure
+2. `TracingDecorator` — starts an OTel `Activity` span per handler, sets `Ok`/`Error` status based on result
 
 Registered via Scrutor `AddHandlerDecorator` in Core layer.
 
@@ -60,7 +60,7 @@ Carter modules implementing `IEndpoints : ICarterModule`. Auto-discovered via `A
 
 ### Error Handling
 
-`GlobalExceptionHandler` catches unhandled exceptions → ProblemDetails (500). `TraceMiddleware` adds `x-trace` header to all responses. `ProblemDetails` configured with traceId, method, endpoint info.
+`GlobalExceptionHandler` routes through `IProblemDetailsService` → ProblemDetails (500). W3C trace context (`traceparent`) propagated from inbound requests. `traceId` injected into ProblemDetails via `Activity.Current?.TraceId`. No custom `x-trace` header.
 
 ## Naming Conventions
 
@@ -85,7 +85,7 @@ Carter modules implementing `IEndpoints : ICarterModule`. Auto-discovered via `A
 - **Settings**: `<Feature>Settings` (e.g., `JwtSettings`, `RedisSettings`)
 - **DI Extensions**: `Add<Feature>Extension` (e.g., `AddSettingsExtension`, `AddRepositoriesExtension`)
 - **Interfaces**: `I` prefix (e.g., `IWeatherForecastRepository`, `IUnitOfWork`)
-- **Constants**: `ErrorConsts`, `Headers`, `Tags`
+- **Constants**: `ErrorConsts`, `Tags`
 
 ### DI Extension Methods
 
@@ -103,7 +103,8 @@ src/
     Extensions/          — ResultExtensions (BadRequest, NotFound, etc.)
     Abstractions/
       Caching/           — CacheFactoryException
-      Decorators/        — ValidationDecorator, LoggingDecorator (Scrutor)
+      Decorators/        — ValidationDecorator, TracingDecorator (Scrutor)
+      Diagnostics/       — ApplicationDiagnostics (ActivitySource)
       Persistence/       — IUnitOfWork interface
     Entities/
       <Aggregate>/       — Entity classes, Errors classes
@@ -133,9 +134,9 @@ src/
     DependencyInjection.cs
 
   YourProjectName.WebApi/
-    Constants/           — Headers (x-trace), Tags
+    Constants/           — Tags
     Extensions/          — ResultExtensions (Result → ProblemHttpResult)
-    Middlewares/         — GlobalExceptionHandler, TraceMiddleware
+    Middlewares/         — GlobalExceptionHandler
     Endpoints/           — IEndpoints interface, Carter endpoint modules
     DependencyInjectionExtensions/
       AddSettingsExtension         — Generic settings binding
@@ -145,6 +146,7 @@ src/
       AddEndpointsExtension        — Carter registration
       AddProblemDetailsExtension   — ProblemDetails customization
       AddOpenApiExtension          — OpenAPI + SwaggerUI
+      AddTelemetryExtension       — OTel tracing, metrics, OTLP export
     Settings/            — JwtSettings
     DependencyInjection.cs
     Program.cs

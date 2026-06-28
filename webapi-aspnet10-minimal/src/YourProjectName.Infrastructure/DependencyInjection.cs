@@ -1,7 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Hybrid;
+using Microsoft.Extensions.Caching.StackExchangeRedis;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using StackExchange.Redis;
 using YourProjectName.Core.Abstractions.Persistence;
 using YourProjectName.Core.Services.Time;
 using YourProjectName.Core.Services.User;
@@ -42,14 +45,20 @@ public static class DependencyInjection
         //HybridCache provides L1 in-memory cache automatically
         if (redisSettings is not null && !string.IsNullOrEmpty(redisSettings.ConnectionString))
         {
+            var opts = ConfigurationOptions.Parse(redisSettings.ConnectionString);
+            opts.AbortOnConnectFail = false;
+
+            services.AddSingleton<IConnectionMultiplexer>(_ => ConnectionMultiplexer.Connect(opts));
+
             services.AddStackExchangeRedisCache(options =>
             {
-                options.Configuration = redisSettings.ConnectionString;
+                options.InstanceName = redisSettings.KeyPrefix;
 
                 logger.LogInformation("Redis connection string {Url}", redisSettings.ConnectionString);
-
-                options.InstanceName = redisSettings.KeyPrefix;
             });
+
+            services.AddOptions<RedisCacheOptions>().Configure<IConnectionMultiplexer>((o, mux) =>
+                o.ConnectionMultiplexerFactory = () => Task.FromResult(mux));
         }
         else
         {
