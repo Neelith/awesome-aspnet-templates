@@ -34,12 +34,11 @@ internal static class DependencyInjection
         JwtSettings jwtSettings = services.AddSettings<JwtSettings>(configuration, startupLogger)
             ?? throw new ApplicationException("Configuration section 'JwtSettings' not found.");
 
-        //Add OpenTelemetry
         bool redisEnabled = redisSettings is not null && !string.IsNullOrEmpty(redisSettings.ConnectionString);
-        webApplicationBuilder.AddTelemetry(redisEnabled);
 
         //Register services here
         services
+            .AddTelemetry(webApplicationBuilder.Environment, redisEnabled)
             .AddRouting(options => options.LowercaseUrls = true)
             .AddHttpContextAccessor()
             .AddExceptionHandler<GlobalExceptionHandler>()

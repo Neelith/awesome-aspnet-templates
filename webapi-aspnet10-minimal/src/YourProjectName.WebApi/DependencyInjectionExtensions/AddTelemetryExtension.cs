@@ -8,18 +8,19 @@ namespace YourProjectName.WebApi.DependencyInjectionExtensions;
 
 internal static class AddTelemetryExtension
 {
-    public static WebApplicationBuilder AddTelemetry(this WebApplicationBuilder webApplicationBuilder, bool enableRedis)
+    public static IServiceCollection AddTelemetry(this IServiceCollection services, IHostEnvironment environment, bool enableRedis)
     {
         string serviceName = "YourProjectName.WebApi";
         string serviceVersion = "1.0.0";
 
-        webApplicationBuilder.Services.AddOpenTelemetry()
+        services.AddOpenTelemetry()
             .ConfigureResource(r => r.AddService(serviceName, serviceVersion))
             .WithTracing(tracing =>
             {
                 tracing
                     .AddAspNetCoreInstrumentation()
                     .AddHttpClientInstrumentation()
+                    .AddEntityFrameworkCoreInstrumentation()
                     .AddNpgsql()
                     .AddSource(ApplicationDiagnostics.ActivitySourceName);
 
@@ -28,7 +29,7 @@ internal static class AddTelemetryExtension
                     tracing.AddRedisInstrumentation();
                 }
 
-                if (webApplicationBuilder.Environment.IsDevelopment())
+                if (environment.IsDevelopment())
                 {
                     tracing.AddConsoleExporter();
                 }
@@ -46,7 +47,7 @@ internal static class AddTelemetryExtension
                     .AddNpgsqlInstrumentation()
                     .AddRuntimeInstrumentation();
 
-                if (webApplicationBuilder.Environment.IsDevelopment())
+                if (!environment.IsEnvironment("Local"))
                 {
                     metrics.AddConsoleExporter();
                 }
@@ -57,6 +58,6 @@ internal static class AddTelemetryExtension
                 }
             });
 
-        return webApplicationBuilder;
+        return services;
     }
 }
