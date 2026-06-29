@@ -3,18 +3,16 @@ using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using YourProjectName.Core.Abstractions.Diagnostics;
+using YourProjectName.WebApi.Settings;
 
 namespace YourProjectName.WebApi.DependencyInjectionExtensions;
 
 internal static class AddTelemetryExtension
 {
-    public static IServiceCollection AddTelemetry(this IServiceCollection services, IHostEnvironment environment, bool enableRedis)
+    public static IServiceCollection AddTelemetry(this IServiceCollection services, OpenTelemetrySettings telemetrySettings, IHostEnvironment environment, bool enableRedis)
     {
-        string serviceName = "YourProjectName.WebApi";
-        string serviceVersion = "1.0.0";
-
         services.AddOpenTelemetry()
-            .ConfigureResource(r => r.AddService(serviceName, serviceVersion))
+            .ConfigureResource(r => r.AddService(telemetrySettings.ServiceName, telemetrySettings.ServiceVersion))
             .WithTracing(tracing =>
             {
                 tracing
@@ -34,9 +32,9 @@ internal static class AddTelemetryExtension
                     tracing.AddConsoleExporter();
                 }
 
-                if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT")))
+                if (!string.IsNullOrEmpty(telemetrySettings.OtlpEndpoint))
                 {
-                    tracing.AddOtlpExporter();
+                    tracing.AddOtlpExporter(options => options.Endpoint = new Uri(telemetrySettings.OtlpEndpoint));
                 }
             })
             .WithMetrics(metrics =>
@@ -52,9 +50,9 @@ internal static class AddTelemetryExtension
                     metrics.AddConsoleExporter();
                 }
 
-                if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT")))
+                if (!string.IsNullOrEmpty(telemetrySettings.OtlpEndpoint))
                 {
-                    metrics.AddOtlpExporter();
+                    metrics.AddOtlpExporter(options => options.Endpoint = new Uri(telemetrySettings.OtlpEndpoint));
                 }
             });
 
