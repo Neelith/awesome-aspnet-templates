@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Microsoft.Extensions.Caching.Hybrid;
 using YourProjectName.Core.Abstractions.Caching;
 using YourProjectName.Core.Entities.WeatherForecasts;
@@ -15,24 +16,36 @@ public sealed class GetWeatherForecastsQueryHandler(
     {
         const string cacheKey = "weatherforecasts";
 
+        var parentActivity = Activity.Current;
+
         try
         {
             var forecasts = await cache.GetOrCreateAsync(
                 cacheKey,
                 async (CancellationToken ct) =>
                 {
-                    var result = await weatherForecastRepository.GetWeatherForecasts(new GetWeatherForecastsRepositoryQuery
+                    var previousActivity = Activity.Current;
+                    try
                     {
-                        TemperatureRangeMin = query?.TemperatureRangeMin,
-                        TemperatureRangeMax = query?.TemperatureRangeMax
-                    }, ct);
+                        Activity.Current = parentActivity;
 
-                    if (result.IsFailure)
-                    {
-                        throw new CacheFactoryException(result.Errors, result.Metadata);
+                        var result = await weatherForecastRepository.GetWeatherForecasts(new GetWeatherForecastsRepositoryQuery
+                        {
+                            TemperatureRangeMin = query?.TemperatureRangeMin,
+                            TemperatureRangeMax = query?.TemperatureRangeMax
+                        }, ct);
+
+                        if (result.IsFailure)
+                        {
+                            throw new CacheFactoryException(result.Errors, result.Metadata);
+                        }
+
+                        return result.Value;
                     }
-
-                    return result.Value;
+                    finally
+                    {
+                        Activity.Current = previousActivity;
+                    }
                 },
                 new HybridCacheEntryOptions { Expiration = TimeSpan.FromMinutes(2) },
                 cancellationToken: cancellationToken);

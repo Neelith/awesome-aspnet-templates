@@ -19,7 +19,6 @@ internal static class AddTelemetryExtension
                     .AddAspNetCoreInstrumentation()
                     .AddHttpClientInstrumentation()
                     .AddEntityFrameworkCoreInstrumentation()
-                    .AddNpgsql()
                     .AddSource(ApplicationDiagnostics.ActivitySourceName);
 
                 if (enableRedis)
@@ -53,6 +52,11 @@ internal static class AddTelemetryExtension
                 if (!string.IsNullOrEmpty(telemetrySettings.OtlpEndpoint))
                 {
                     metrics.AddOtlpExporter(options => options.Endpoint = new Uri(telemetrySettings.OtlpEndpoint));
+                }
+
+                if (!string.IsNullOrEmpty(telemetrySettings.MetricsOtlpEndpoint))
+                {
+                    metrics.AddOtlpExporter(options => options.Endpoint = new Uri(telemetrySettings.MetricsOtlpEndpoint));
                 }
             });
 
