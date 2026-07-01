@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Caching.StackExchangeRedis;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using StackExchange.Redis;
@@ -9,6 +10,7 @@ using YourProjectName.Core.Abstractions.Persistence;
 using YourProjectName.Core.Services.Time;
 using YourProjectName.Core.Services.User;
 using YourProjectName.Infrastructure.Caching;
+using YourProjectName.Infrastructure.HealthChecks;
 using YourProjectName.Infrastructure.Persistence;
 using YourProjectName.Infrastructure.Persistence.Repositories;
 using YourProjectName.Infrastructure.Time;
@@ -31,12 +33,13 @@ public static class DependencyInjection
                 .AddDbContext(dbConnectionString)
                 .AddRepositories()
                 .AddCaching(redisSettings, logger)
-                .AddCurrentUserService();
+                .AddCurrentUserService()
+                .AddInfrastructureHealthChecks();
 
         return services;
     }
 
-    public static IServiceCollection AddCaching(
+    private static IServiceCollection AddCaching(
         this IServiceCollection services,
         RedisSettings? redisSettings,
         ILogger logger)
@@ -70,7 +73,7 @@ public static class DependencyInjection
         return services;
     }
 
-    public static IServiceCollection AddDbContext(this IServiceCollection services, string? connectionString)
+    private static IServiceCollection AddDbContext(this IServiceCollection services, string? connectionString)
     {
         if (string.IsNullOrEmpty(connectionString))
         {
@@ -84,15 +87,28 @@ public static class DependencyInjection
         return services;
     }
 
-    public static IServiceCollection AddTime(this IServiceCollection services)
+    private static IServiceCollection AddTime(this IServiceCollection services)
     {
         services.AddScoped<IDateTimeProvider, DateTimeProvider>();
         return services;
     }
 
-    public static IServiceCollection AddCurrentUserService(this IServiceCollection services)
+    private static IServiceCollection AddCurrentUserService(this IServiceCollection services)
     {
         services.AddScoped<ICurrentUserService, CurrentUserService>();
+
+        return services;
+    }
+
+    private static IServiceCollection AddInfrastructureHealthChecks(this IServiceCollection services)
+    {
+        IHealthChecksBuilder builder = services.AddHealthChecks()
+            .AddDbContextCheck<ApplicationDbContext>(
+                name: "postgresql",
+                tags: ["ready"])
+            .AddCheck<RedisHealthCheck>(
+                name: "redis", 
+                tags: ["ready"]);
 
         return services;
     }

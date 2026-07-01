@@ -1,31 +1,14 @@
 # TODO
 
-## 1. Refactor logging to use OTel — remove custom traceid and manual logging
-
-- [x] Add OpenTelemetry packages (`OpenTelemetry.Extensions.Hosting`, `OpenTelemetry.Exporter.Console`/Zipkin/OTLP)
-- [x] Configure OTel in `Program.cs`: add `OpenTelemetryBuilder` with ASP.NET Core instrumentation + `ILogger` integration
-- [x] Replace `TraceMiddleware` (custom `x-trace` header / `LogContext.PushProperty`) with OTel `ActivitySource` — keep `x-trace` header via `Activity.Current?.Id`
-- [x] Remove `LoggingDecorator` (manual `LogInformation`/`LogError` before/after each handler) — replace with OTel activity events + native `ILogger` scopes
-- [x] Update `GlobalExceptionHandler`: remove manual `traceId` extraction from header — use `httpContext.TraceIdentifier` or `Activity.Current?.Id`
-- [x] Remove `Serilog.Context` dependency from WebApi
-- [x] Update `appsettings.*.json` — remove `TraceIdentifier` from Serilog output templates, rely on OTel-enriched logging
-
-## 2. Infrastructure — docker-compose + health checks
-
-### docker-compose.yml
-- [ ] Create `docker-compose.yml` with:
-  - `postgres:17-alpine` — port 5432, healthcheck, persistent volume
-  - `redis:7-alpine` — port 6379, healthcheck, persistent volume
-  - `keycloak:26.1` — port 8080, dev mode, uses postgres as KC DB
-  - Named volumes for all three services
-  - Container names match existing `appsettings.Local.json` references (`postgres-compose`, `redis-compose`, `keycloak-compose`)
-
 ### Health checks
-- [] Added `Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore` package to WebApi
-- [] Created `HealthChecks/RedisHealthCheck.cs` — pings Redis via `IDistributedCache`
-- [] Created `HealthChecks/DatabaseHealthCheck.cs` — pings PostgreSQL via `SELECT 1` with Npgsql
-- [] Created `DependencyInjectionExtensions/AddHealthCheckExtension.cs` — registers both checks, maps `GET /health`, writes JSON response
-- [] Wired `AddAppHealthChecks(dbConnectionString)` and `UseAppHealthChecks()` into `DependencyInjection.cs`
+- [x] Added `Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore` package to Infrastructure
+- [x] Created `HealthChecks/RedisHealthCheck.cs` — pings Redis via `IConnectionMultiplexer.GetDatabase().PingAsync()`
+- [x] Used `AddDbContextCheck<ApplicationDbContext>` for PostgreSQL probe (no custom DatabaseHealthCheck needed)
+- [x] Added `AddHealthChecks(redisEnabled)` to Infrastructure `DependencyInjection.cs` — conditional Redis check
+- [x] Created `DependencyInjectionExtensions/AddHealthCheckExtension.cs` — registers `self` liveness check, maps `/health/live`, `/health/ready`, `/health` with JSON response writer
+- [x] Wired `AddAppHealthChecks(redisEnabled)` and `UseAppHealthChecks()` into `DependencyInjection.cs`
+- [x] Added `Liveness`/`Readiness` constants to `Tags.cs`
+- [ ] Add integration/E2E test for `/health` endpoints
 
 ## 3. Add dotnet CLI templates to create CQRS handlers
 

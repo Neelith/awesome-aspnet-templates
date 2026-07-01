@@ -38,11 +38,9 @@ internal static class DependencyInjection
         OpenTelemetrySettings telemetrySettings = services.AddSettings<OpenTelemetrySettings>(configuration, startupLogger)
             ?? new OpenTelemetrySettings();
 
-        bool redisEnabled = redisSettings is not null && !string.IsNullOrEmpty(redisSettings.ConnectionString);
-
         //Register services here
         services
-            .AddTelemetry(telemetrySettings, webApplicationBuilder.Environment, redisEnabled)
+            .AddTelemetry(telemetrySettings, webApplicationBuilder.Environment)
             .AddRouting(options => options.LowercaseUrls = true)
             .AddHttpContextAccessor()
             .AddExceptionHandler<GlobalExceptionHandler>()
@@ -51,6 +49,7 @@ internal static class DependencyInjection
             .AddAuthorizationServices()
             .AddCoreServices()
             .AddInfrastructureServices(startupLogger, dbConnectionString, redisSettings)
+            .AddAppHealthChecks()
             .AddEndpoints(Assembly.GetExecutingAssembly())
             .AddOpenApiServices(jwtSettings);
 
@@ -70,6 +69,9 @@ internal static class DependencyInjection
         app.UseAuthentication();
 
         app.UseAuthorization();
+
+        //Map health check endpoints
+        app.UseAppHealthChecks();
 
         //Register all the endpoints that implement the IEndpoints interface
         app.MapEndpoints();
