@@ -404,3 +404,4 @@ FodyWeavers.xsd
 /webapi-aspnet10/src/containers/keycloak
 
 .containers
+.logs
