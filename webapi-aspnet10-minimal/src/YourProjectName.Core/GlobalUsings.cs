@@ -5,4 +5,4 @@ global using Hermes.Requests;
 global using Hermes.Responses;
 global using Hermes.Results;
 
-namespace YourProjectName.Application;
+namespace YourProjectName.Core;
