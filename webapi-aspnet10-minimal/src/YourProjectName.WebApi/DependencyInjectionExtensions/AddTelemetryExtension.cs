@@ -9,7 +9,7 @@ namespace YourProjectName.WebApi.DependencyInjectionExtensions;
 
 internal static class AddTelemetryExtension
 {
-    public static IServiceCollection AddTelemetry(this IServiceCollection services, OpenTelemetrySettings telemetrySettings, IHostEnvironment environment, bool enableRedis)
+    public static IServiceCollection AddTelemetry(this IServiceCollection services, OpenTelemetrySettings telemetrySettings, IHostEnvironment environment)
     {
         services.AddOpenTelemetry()
             .ConfigureResource(r => r.AddService(telemetrySettings.ServiceName, telemetrySettings.ServiceVersion))
@@ -19,12 +19,8 @@ internal static class AddTelemetryExtension
                     .AddAspNetCoreInstrumentation()
                     .AddHttpClientInstrumentation()
                     .AddEntityFrameworkCoreInstrumentation()
+                    .AddRedisInstrumentation()
                     .AddSource(ApplicationDiagnostics.ActivitySourceName);
-
-                if (enableRedis)
-                {
-                    tracing.AddRedisInstrumentation();
-                }
 
                 if (environment.IsDevelopment())
                 {
@@ -52,11 +48,6 @@ internal static class AddTelemetryExtension
                 if (!string.IsNullOrEmpty(telemetrySettings.OtlpEndpoint))
                 {
                     metrics.AddOtlpExporter(options => options.Endpoint = new Uri(telemetrySettings.OtlpEndpoint));
-                }
-
-                if (!string.IsNullOrEmpty(telemetrySettings.MetricsOtlpEndpoint))
-                {
-                    metrics.AddOtlpExporter(options => options.Endpoint = new Uri(telemetrySettings.MetricsOtlpEndpoint));
                 }
             });
 
