@@ -19,12 +19,13 @@ public class WeatherForecast : AuditableEntity
         Summary = summary;
     }
 
-    //EF constructor
+    // Constructor used by EF Core materialization
     private WeatherForecast(int id, DateOnly date, int temperatureC) : this(date, temperatureC, null)
     {
         Id = id;
     }
 
+    // Constructor used by System.Text.Json deserialization (HybridCache L2)
     [JsonConstructor]
     private WeatherForecast(int id, DateOnly date, int temperatureC, Summary? summary) : this(date, temperatureC, summary)
     {
@@ -33,15 +34,34 @@ public class WeatherForecast : AuditableEntity
 
     public static Result<WeatherForecast> Create(DateOnly date, int temperatureC, string? summaryValue)
     {
-        bool isSummaryValorized = !string.IsNullOrEmpty(summaryValue);
+        Result<Summary>? summaryResult = CreateSummary(summaryValue);
 
-        var summaryCreationResult = isSummaryValorized ? Summary.Create(summaryValue!) : null;
-
-        if (summaryCreationResult?.IsFailure is true)
+        if (summaryResult?.IsFailure is true)
         {
-            return Result.Ko<WeatherForecast>(summaryCreationResult.Errors, summaryCreationResult.Metadata);
+            return Result.Ko<WeatherForecast>(summaryResult.Errors, summaryResult.Metadata);
         }
 
-        return new WeatherForecast(date, temperatureC, isSummaryValorized ? summaryCreationResult!.Value : null);
+        return new WeatherForecast(date, temperatureC, summaryResult?.Value);
+    }
+
+    public Result Update(DateOnly date, int temperatureC, string? summaryValue)
+    {
+        Result<Summary>? summaryResult = CreateSummary(summaryValue);
+
+        if (summaryResult?.IsFailure is true)
+        {
+            return Result.Ko(summaryResult.Errors, summaryResult.Metadata);
+        }
+
+        Date = date;
+        TemperatureC = temperatureC;
+        Summary = summaryResult?.Value;
+
+        return Result.Ok();
+    }
+
+    private static Result<Summary>? CreateSummary(string? summaryValue)
+    {
+        return string.IsNullOrEmpty(summaryValue) ? null : Summary.Create(summaryValue!);
     }
 }

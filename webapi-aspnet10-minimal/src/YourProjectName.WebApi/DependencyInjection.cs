@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using YourProjectName.Core;
+﻿using YourProjectName.Core;
 using YourProjectName.Infrastructure;
 using YourProjectName.Infrastructure.Caching;
 using YourProjectName.Infrastructure.Persistence;
@@ -24,15 +23,14 @@ internal static class DependencyInjection
 
         //Get the database connection string
         string dbConnectionString = configuration.GetConnectionString("YourProjectNameDb")
-            ?? throw new ApplicationException("Connection string 'YourProjectNameDb' not found.");
+            ?? throw new InvalidOperationException("Connection string 'YourProjectNameDb' not found.");
 
-        //Add the redis settings to the container and get an istance of it
-        RedisSettings? redisSettings = services.AddSettings<RedisSettings>(configuration, startupLogger)
-            ?? throw new ApplicationException("Configuration section 'RedisSettings' not found.");
+        //Add the redis settings to the container and get an instance of it (optional, falls back to L1-only cache)
+        RedisSettings? redisSettings = services.AddSettings<RedisSettings>(configuration, startupLogger);
 
-        //Add the jwt settings to the container and get an istance of it
+        //Add the jwt settings to the container and get an instance of it
         JwtSettings jwtSettings = services.AddSettings<JwtSettings>(configuration, startupLogger)
-            ?? throw new ApplicationException("Configuration section 'JwtSettings' not found.");
+            ?? throw new InvalidOperationException("Configuration section 'JwtSettings' not found.");
 
         //Load telemetry settings (optional, defaults baked into class)
         OpenTelemetrySettings telemetrySettings = services.AddSettings<OpenTelemetrySettings>(configuration, startupLogger)
@@ -44,13 +42,13 @@ internal static class DependencyInjection
             .AddRouting(options => options.LowercaseUrls = true)
             .AddHttpContextAccessor()
             .AddExceptionHandler<GlobalExceptionHandler>()
-            .ConfigureProblemDetails()
-            .AddAuthenticationServices(jwtSettings)
+            .AddProblemDetailsServices()
+            .AddAuthenticationServices(jwtSettings, webApplicationBuilder.Environment)
             .AddAuthorizationServices()
             .AddCoreServices()
             .AddInfrastructureServices(startupLogger, dbConnectionString, redisSettings)
-            .AddAppHealthChecks()
-            .AddEndpoints(Assembly.GetExecutingAssembly())
+            .AddHealthCheckServices()
+            .AddEndpoints()
             .AddOpenApiServices(jwtSettings);
 
         return services;
@@ -71,9 +69,9 @@ internal static class DependencyInjection
         app.UseAuthorization();
 
         //Map health check endpoints
-        app.UseAppHealthChecks();
+        app.MapHealthCheckEndpoints();
 
-        //Register all the endpoints that implement the IEndpoints interface
+        //Register all the endpoints discovered by Carter
         app.MapEndpoints();
 
         //Enable OpenApi documentation and UI

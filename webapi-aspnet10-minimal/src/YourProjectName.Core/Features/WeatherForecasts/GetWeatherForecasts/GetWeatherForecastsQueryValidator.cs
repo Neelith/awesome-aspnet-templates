@@ -5,13 +5,15 @@ public sealed class GetWeatherForecastsQueryValidator : AbstractValidator<GetWea
     public GetWeatherForecastsQueryValidator()
     {
         RuleFor(x => x.TemperatureRangeMin)
-            .GreaterThanOrEqualTo(-20)
-            .LessThanOrEqualTo(55)
+            .InclusiveBetween(-100, 100)
             .When(x => x.TemperatureRangeMin.HasValue);
 
         RuleFor(x => x.TemperatureRangeMax)
-            .GreaterThanOrEqualTo(-20)
-            .LessThanOrEqualTo(55)
+            .InclusiveBetween(-100, 100)
             .When(x => x.TemperatureRangeMax.HasValue);
+
+        RuleFor(x => x.PageNumber).GreaterThanOrEqualTo(1);
+
+        RuleFor(x => x.PageSize).InclusiveBetween(1, 100);
     }
 }

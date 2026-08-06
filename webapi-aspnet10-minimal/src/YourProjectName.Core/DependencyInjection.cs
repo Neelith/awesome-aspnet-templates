@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using YourProjectName.Core.Abstractions.Decorators;
+using YourProjectName.Core.Shared;
 
 namespace YourProjectName.Core;
 
@@ -15,6 +16,13 @@ public static class DependencyInjection
             .AddHandlers()
             .AddValidatorsFromAssembly(assembly)
             .AddDecorators();
+
+        //Register domain event handlers
+        services.Scan(scan => scan
+            .FromAssemblies(assembly)
+            .AddClasses(classes => classes.AssignableTo(typeof(IDomainEventHandler<>)))
+            .AsImplementedInterfaces()
+            .WithScopedLifetime());
 
         return services;
     }

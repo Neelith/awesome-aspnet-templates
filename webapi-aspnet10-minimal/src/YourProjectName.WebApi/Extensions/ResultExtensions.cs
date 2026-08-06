@@ -6,6 +6,7 @@ namespace YourProjectName.WebApi.Extensions;
 
 internal static class ResultExtensions
 {
+    private const string GenericErrorDetail = "An unexpected error occurred.";
 
     public static ProblemHttpResult ToErrorResponse<T>(this Result<T> result)
     {
@@ -31,6 +32,7 @@ internal static class ResultExtensions
         return errorType switch
         {
             ErrorConsts.BadRequestCode => result.ToProblem(HttpStatusCode.BadRequest),
+            ErrorConsts.UnauthorizedCode => result.ToProblem(HttpStatusCode.Unauthorized),
             ErrorConsts.NotFoundCode => result.ToProblem(HttpStatusCode.NotFound),
             ErrorConsts.InternalServerErrorCode => result.ToProblem(HttpStatusCode.InternalServerError),
             _ => throw new ArgumentException("Unhandled result error code"),
@@ -39,9 +41,15 @@ internal static class ResultExtensions
 
     private static ProblemHttpResult ToProblem(this Result result, HttpStatusCode statusCode)
     {
+        //Internal server errors must not leak implementation details to the client
+        if (statusCode == HttpStatusCode.InternalServerError)
+        {
+            return TypedResults.Problem(detail: GenericErrorDetail, statusCode: (int)statusCode, title: statusCode.ToString());
+        }
+
         var errors = result.Errors.Count > 1
             ? string.Join("\n---\n", result.Errors.Select(e => e.Message))
-            : result.Errors.Count == 0 ? "Generic error." : result.Errors[0].Message;
+            : result.Errors.Count == 0 ? GenericErrorDetail : result.Errors[0].Message;
 
         return TypedResults.Problem(detail: errors, statusCode: (int)statusCode, title: statusCode.ToString());
     }

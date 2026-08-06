@@ -7,6 +7,7 @@ namespace YourProjectName.Core.Repositories.WeatherForecastRepository;
 
 public interface IWeatherForecastRepository
 {
-    Task<Result<List<WeatherForecast>>> GetWeatherForecasts(GetWeatherForecastsRepositoryQuery? query, CancellationToken cancellationToken);
+    Task<Result<PagedResponse<WeatherForecast>>> GetWeatherForecasts(GetWeatherForecastsRepositoryQuery query, CancellationToken cancellationToken);
+    Task<Result<WeatherForecast>> GetWeatherForecastById(GetWeatherForecastByIdRepositoryQuery query, CancellationToken cancellationToken);
     Task<Result<WeatherForecast>> CreateWeatherForecast(CreateWeatherForecastRepositoryCommand command, CancellationToken cancellationToken);
 }

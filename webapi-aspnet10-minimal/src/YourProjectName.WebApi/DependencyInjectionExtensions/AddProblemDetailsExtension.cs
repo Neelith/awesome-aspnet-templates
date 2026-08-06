@@ -4,7 +4,7 @@ namespace YourProjectName.WebApi.DependencyInjectionExtensions;
 
 internal static class AddProblemDetailsExtension
 {
-    public static IServiceCollection ConfigureProblemDetails(this IServiceCollection services)
+    public static IServiceCollection AddProblemDetailsServices(this IServiceCollection services)
     {
         services.AddProblemDetails(options =>
                     options.CustomizeProblemDetails = context =>

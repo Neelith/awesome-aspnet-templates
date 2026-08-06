@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace YourProjectName.Core.Constants;
 
 public static class ErrorConsts

@@ -16,7 +16,7 @@ WebApi
 |---|---|---|
 | **Core** | `YourProjectName.Core` | Entities, value objects, CQRS handlers/validators, repository interfaces, decorators, abstractions (`CacheFactoryException`, `IUnitOfWork`), domain event primitives. No external infrastructure deps. |
 | **Infrastructure** | `YourProjectName.Infrastructure` | EF Core `ApplicationDbContext`, repository implementations, HybridCache (Redis-backed), `DateTimeProvider`, `CurrentUserService`. References Core. |
-| **WebApi** | `YourProjectName.WebApi` | Entry point. Carter endpoints (`IEndpoints`), middleware (`GlobalExceptionHandler`), settings (JWT, Redis), OpenAPI, auth/authz, OTel telemetry, DI composition root. References Core + Infrastructure. |
+| **WebApi** | `YourProjectName.WebApi` | Entry point. Carter endpoints (`ICarterModule`), middleware (`GlobalExceptionHandler`), settings (JWT, Redis), OpenAPI, auth/authz, OTel telemetry, DI composition root. References Core + Infrastructure. |
 
 ### CQRS Pattern
 
@@ -48,15 +48,15 @@ The project is using Domain Driven Design, so keep rich domain models (entities)
 
 ### Database
 
-EF Core with Npgsql (PostgreSQL). Soft delete via `AuditableEntity.Deleted` + global query filter. Auditing: `CreatedAtUtc`, `CreatedBy`, `UpdatedAtUtc`, `UpdatedBy`. Migrations auto-applied on startup via `AddDatabaseMigrationsExtension`.
+EF Core with Npgsql (PostgreSQL). Soft delete via `AuditableEntity.Deleted` + global query filter (`MarkAsDeleted()`). Auditing: `CreatedAtUtc`, `CreatedBy`, `UpdatedAtUtc`, `UpdatedBy`. Migrations auto-applied on startup via `AddDatabaseMigrationsExtension`; startup fails fast if the database is unreachable. Domain events raised via `Entity.RaiseDomainEvent` are dispatched to `IDomainEventHandler<T>` implementations after `SaveChangesAsync`.
 
 ### Caching
 
-HybridCache (`HybridCache`) with Redis L2 backend. L1 in-memory cache built-in. Falls back to L1-only if Redis not configured. `RedisSettings` section configures Redis connection. `CacheFactoryException` propagates DB errors from `GetOrCreateAsync` factory.
+HybridCache (`HybridCache`) with Redis L2 backend. L1 in-memory cache built-in. Falls back to L1-only if Redis not configured. `RedisSettings` section configures Redis connection. `CacheFactoryException` propagates DB errors from `GetOrCreateAsync` factory. Cache keys include all query parameters; entries are tagged (`CacheTags`) and write handlers invalidate via `RemoveByTagAsync`.
 
 ### Endpoints
 
-Carter modules implementing `IEndpoints : ICarterModule`. Auto-discovered via `AddCarter()` / `MapCarter()`. Lowercase URLs enforced.
+Carter modules implementing `ICarterModule`. Auto-discovered via `AddCarter()` / `MapCarter()`. Lowercase URLs enforced. Health checks: `/health/live` anonymous; `/health` and `/health/ready` require authorization because responses include infrastructure details.
 
 ### Error Handling
 
@@ -85,20 +85,21 @@ Carter modules implementing `IEndpoints : ICarterModule`. Auto-discovered via `A
 - **Settings**: `<Feature>Settings` (e.g., `JwtSettings`, `RedisSettings`)
 - **DI Extensions**: `Add<Feature>Extension` (e.g., `AddSettingsExtension`, `AddRepositoriesExtension`)
 - **Interfaces**: `I` prefix (e.g., `IWeatherForecastRepository`, `IUnitOfWork`)
-- **Constants**: `ErrorConsts`, `Tags`
+- **Constants**: `ErrorConsts`, `CacheTags`, `HealthCheckTags`, `Tags`
 
 ### DI Extension Methods
 
-- `Add<Feature>()` — registers feature services, returns `IServiceCollection`
+- `Add<Feature>()` — registers feature services, returns `IServiceCollection`. When the name collides with a framework extension, use `Add<Feature>Services()` (e.g., `AddProblemDetailsServices`, `AddHealthCheckServices`)
 - `Add<Layer>Services()` — layer-level registration entry point
 - `Use<Feature>()` — middleware/configure phase (e.g., `UseOpenApi()`, `UseLogging()`)
+- `Map<Feature>Endpoints()` — endpoint mapping phase (e.g., `MapEndpoints()`, `MapHealthCheckEndpoints()`)
 
 ### Directory Structure
 
 ```
 src/
   YourProjectName.Core/
-    Constants/           — ErrorConsts (HTTP status code mappings)
+    Constants/           — ErrorConsts (HTTP status code mappings), CacheTags, HealthCheckTags
     ValueObjects/        — Value objects with factory methods + validation
     Extensions/          — ResultExtensions (BadRequest, NotFound, etc.)
     Abstractions/
@@ -137,7 +138,7 @@ src/
     Constants/           — Tags
     Extensions/          — ResultExtensions (Result → ProblemHttpResult)
     Middlewares/         — GlobalExceptionHandler
-    Endpoints/           — IEndpoints interface, Carter endpoint modules
+    Endpoints/           — Carter endpoint modules
     DependencyInjectionExtensions/
       AddSettingsExtension         — Generic settings binding
       AddLoggingExtension          — Serilog config
@@ -146,7 +147,9 @@ src/
       AddEndpointsExtension        — Carter registration
       AddProblemDetailsExtension   — ProblemDetails customization
       AddOpenApiExtension          — OpenAPI + SwaggerUI
-      AddTelemetryExtension       — OTel tracing, metrics, OTLP export
+      AddTelemetryExtension        — OTel tracing, metrics, OTLP export
+      AddHealthCheckExtension      — Health check registration + mapping
+      HealthCheckResponseWriter    — JSON health report writer
     Settings/            — JwtSettings
     DependencyInjection.cs
     Program.cs

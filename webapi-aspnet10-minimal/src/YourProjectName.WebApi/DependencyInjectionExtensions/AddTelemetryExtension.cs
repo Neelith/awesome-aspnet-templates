@@ -11,6 +11,10 @@ internal static class AddTelemetryExtension
 {
     public static IServiceCollection AddTelemetry(this IServiceCollection services, OpenTelemetrySettings telemetrySettings, IHostEnvironment environment)
     {
+        //Console exporters dump telemetry to stdout: useful locally, noise in production,
+        //where telemetry should flow through the OTLP exporter instead
+        bool useConsoleExporter = environment.IsDevelopment() || environment.IsEnvironment("Local");
+
         services.AddOpenTelemetry()
             .ConfigureResource(r => r.AddService(telemetrySettings.ServiceName, telemetrySettings.ServiceVersion))
             .WithTracing(tracing =>
@@ -22,7 +26,7 @@ internal static class AddTelemetryExtension
                     .AddRedisInstrumentation()
                     .AddSource(ApplicationDiagnostics.ActivitySourceName);
 
-                if (environment.IsDevelopment())
+                if (useConsoleExporter)
                 {
                     tracing.AddConsoleExporter();
                 }
@@ -40,7 +44,7 @@ internal static class AddTelemetryExtension
                     .AddNpgsqlInstrumentation()
                     .AddRuntimeInstrumentation();
 
-                if (!environment.IsEnvironment("Local"))
+                if (useConsoleExporter)
                 {
                     metrics.AddConsoleExporter();
                 }

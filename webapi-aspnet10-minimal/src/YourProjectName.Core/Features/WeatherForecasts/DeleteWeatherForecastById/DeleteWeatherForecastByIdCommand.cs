@@ -2,4 +2,5 @@ namespace YourProjectName.Core.Features.WeatherForecasts.DeleteWeatherForecastBy
 
 public class DeleteWeatherForecastByIdCommand : ICommand
 {
+    public int Id { get; set; }
 }

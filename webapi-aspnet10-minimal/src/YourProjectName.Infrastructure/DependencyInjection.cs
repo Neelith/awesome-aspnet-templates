@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using StackExchange.Redis;
 using YourProjectName.Core.Abstractions.Persistence;
+using YourProjectName.Core.Constants;
 using YourProjectName.Core.Services.Time;
 using YourProjectName.Core.Services.User;
 using YourProjectName.Infrastructure.Caching;
@@ -23,7 +24,7 @@ public static class DependencyInjection
     public static IServiceCollection AddInfrastructureServices(
         this IServiceCollection services,
         ILogger logger,
-        string? dbConnectionString,
+        string dbConnectionString,
         RedisSettings? redisSettings = default)
     {
         //Register infrastructure services here
@@ -56,12 +57,12 @@ public static class DependencyInjection
             services.AddStackExchangeRedisCache(options =>
             {
                 options.InstanceName = redisSettings.KeyPrefix;
-
-                logger.LogInformation("Redis connection string {Url}", redisSettings.ConnectionString);
             });
 
             services.AddOptions<RedisCacheOptions>().Configure<IConnectionMultiplexer>((o, mux) =>
                 o.ConnectionMultiplexerFactory = () => Task.FromResult(mux));
+
+            logger.LogInformation("HybridCache configured with Redis L2 backend (key prefix: {KeyPrefix})", redisSettings.KeyPrefix);
         }
         else
         {
@@ -73,13 +74,8 @@ public static class DependencyInjection
         return services;
     }
 
-    private static IServiceCollection AddDbContext(this IServiceCollection services, string? connectionString)
+    private static IServiceCollection AddDbContext(this IServiceCollection services, string connectionString)
     {
-        if (string.IsNullOrEmpty(connectionString))
-        {
-            throw new ArgumentNullException(nameof(connectionString));
-        }
-
         services.AddDbContext<ApplicationDbContext>((options) => options.UseNpgsql(connectionString));
 
         services.AddScoped<IUnitOfWork>(provider => provider.GetRequiredService<ApplicationDbContext>());
@@ -105,10 +101,10 @@ public static class DependencyInjection
         IHealthChecksBuilder builder = services.AddHealthChecks()
             .AddDbContextCheck<ApplicationDbContext>(
                 name: "postgresql",
-                tags: ["ready"])
+                tags: [HealthCheckTags.Readiness])
             .AddCheck<RedisHealthCheck>(
-                name: "redis", 
-                tags: ["ready"]);
+                name: "redis",
+                tags: [HealthCheckTags.Readiness]);
 
         return services;
     }

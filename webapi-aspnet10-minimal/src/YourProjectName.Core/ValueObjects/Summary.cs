@@ -1,5 +1,4 @@
 using System.Text.Json.Serialization;
-using YourProjectName.Core.Entities.WeatherForecasts;
 using YourProjectName.Core.Extensions;
 using ResultExtensions = YourProjectName.Core.Extensions.ResultExtensions;
 
