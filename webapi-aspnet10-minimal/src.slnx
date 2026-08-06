@@ -1,0 +1,15 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/YourProjectName.Infrastructure/YourProjectName.Infrastructure.csproj" />
+    <Project Path="src/YourProjectName.WebApi/YourProjectName.WebApi.csproj" />
+    <Project Path="src/YourProjectName.Core/YourProjectName.Core.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/YourProjectName.E2E.Tests/YourProjectName.E2E.Tests.csproj" />
+    <Project Path="tests/YourProjectName.Integration.Tests/YourProjectName.Integration.Tests.csproj" />
+    <Project Path="tests/YourProjectName.Unit.Tests/YourProjectName.Unit.Tests.csproj" />
+  </Folder>
+</Solution>

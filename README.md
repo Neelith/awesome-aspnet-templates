@@ -1,6 +1,14 @@
 # awesome-aspnet-templates
 A collection of ASP.NET templates
 
+## Available Templates
+
+| Template | Target | Description |
+|---|---|---|
+| `webapi-aspnet10-minimal` | .NET 10 | Minimal Web API with Clean Architecture + CQRS, EF Core (PostgreSQL), HybridCache (Redis), JWT auth, OpenTelemetry, Serilog. See its [README](webapi-aspnet10-minimal/README.md) for setup and security notes. |
+| `webapi-aspnet10` | .NET 10 | Full Web API template |
+| `webapi-aspnet8` | .NET 8 | Web API template |
+
 # Structure of the Projects
 
 Each project is structured using clean architecture. The domain and application layers return a result object, which is handled by the upper layer. Once it reaches the Web API layer, it is mapped into a response or problem details.  
