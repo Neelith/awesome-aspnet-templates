@@ -35,7 +35,7 @@ public static class DependencyInjection
                 .AddRepositories()
                 .AddCaching(redisSettings, logger)
                 .AddCurrentUserService()
-                .AddInfrastructureHealthChecks();
+                .AddInfrastructureHealthChecks(redisSettings);
 
         return services;
     }
@@ -96,15 +96,19 @@ public static class DependencyInjection
         return services;
     }
 
-    private static IServiceCollection AddInfrastructureHealthChecks(this IServiceCollection services)
+    private static IServiceCollection AddInfrastructureHealthChecks(this IServiceCollection services, RedisSettings? redisSettings)
     {
         IHealthChecksBuilder builder = services.AddHealthChecks()
             .AddDbContextCheck<ApplicationDbContext>(
                 name: "postgresql",
-                tags: [HealthCheckTags.Readiness])
-            .AddCheck<RedisHealthCheck>(
+                tags: [HealthCheckTags.Readiness]);
+
+        if (redisSettings is not null && !string.IsNullOrEmpty(redisSettings.ConnectionString))
+        {
+            builder.AddCheck<RedisHealthCheck>(
                 name: "redis",
                 tags: [HealthCheckTags.Readiness]);
+        }
 
         return services;
     }

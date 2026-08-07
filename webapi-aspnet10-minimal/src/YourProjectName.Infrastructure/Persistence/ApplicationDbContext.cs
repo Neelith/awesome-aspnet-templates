@@ -89,10 +89,7 @@ internal class ApplicationDbContext(
                     continue;
                 }
 
-                if (handlerType.GetMethod(nameof(IDomainEventHandler<IDomainEvent>.Handle))?.Invoke(handler, [domainEvent, cancellationToken]) is Task task)
-                {
-                    await task;
-                }
+                await ((dynamic)handler).Handle((dynamic)domainEvent, cancellationToken);
             }
         }
     }

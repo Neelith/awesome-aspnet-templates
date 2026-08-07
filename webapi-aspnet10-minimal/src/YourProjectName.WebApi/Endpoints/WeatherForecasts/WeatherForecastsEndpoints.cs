@@ -61,11 +61,17 @@ public class WeatherForecastsEndpoints : ICarterModule
 
         group.MapPut("{id:int}", async
             ([FromRoute] int id,
-            [FromBody] UpdateWeatherForecastByIdCommand command,
+            [FromBody] UpdateWeatherForecastByIdCommand body,
             [FromServices] ICommandHandler<UpdateWeatherForecastByIdCommand> handler,
             CancellationToken cancellationToken) =>
         {
-            command.Id = id;
+            var command = new UpdateWeatherForecastByIdCommand
+            {
+                Id = id,
+                Date = body.Date,
+                TemperatureC = body.TemperatureC,
+                Summary = body.Summary
+            };
 
             var result = await handler.Handle(command, cancellationToken);
 

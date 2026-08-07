@@ -23,6 +23,9 @@
 **/values.dev.yaml
 LICENSE
 README.md
+AGENTS.md
+.template.config/
+tests/
 !**/.gitignore
 !.git/HEAD
 !.git/config

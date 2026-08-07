@@ -22,8 +22,6 @@ internal static class AddTelemetryExtension
                 tracing
                     .AddAspNetCoreInstrumentation()
                     .AddHttpClientInstrumentation()
-                    .AddEntityFrameworkCoreInstrumentation()
-                    .AddRedisInstrumentation()
                     .AddSource(ApplicationDiagnostics.ActivitySourceName);
 
                 if (useConsoleExporter)

@@ -1,3 +1,4 @@
+using Microsoft.OpenApi;
 using YourProjectName.WebApi.Settings;
 
 namespace YourProjectName.WebApi.DependencyInjectionExtensions;
@@ -8,7 +9,37 @@ internal static class AddOpenApiExtension
     {
         services.AddEndpointsApiExplorer();
 
-        services.AddOpenApi();
+        services.AddOpenApi(options =>
+        {
+            options.AddDocumentTransformer((document, context, cancellationToken) =>
+            {
+#pragma warning disable CS8602
+                document.Components ??= new OpenApiComponents();
+                document.Components.SecuritySchemes["Bearer"] = new OpenApiSecurityScheme
+                {
+                    Type = SecuritySchemeType.Http,
+                    Scheme = "bearer",
+                    BearerFormat = "JWT",
+                    Description = jwtSettings.Authority is not null
+                        ? $"JWT Authorization header using the Bearer scheme. Authority: {jwtSettings.Authority}"
+                        : "JWT Authorization header using the Bearer scheme.",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header
+                };
+#pragma warning restore CS8602
+
+                document.Security ??= [];
+                document.Security.Add(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecuritySchemeReference("Bearer"),
+                        []
+                    }
+                });
+
+                return Task.CompletedTask;
+            });
+        });
 
         return services;
     }

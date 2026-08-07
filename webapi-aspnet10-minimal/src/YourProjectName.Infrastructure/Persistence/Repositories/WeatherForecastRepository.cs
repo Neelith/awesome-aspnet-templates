@@ -39,6 +39,9 @@ internal class WeatherForecastRepository(ApplicationDbContext applicationDbConte
 
     public async Task<Result<PagedResponse<WeatherForecast>>> GetWeatherForecasts(GetWeatherForecastsRepositoryQuery repositoryQuery, CancellationToken cancellationToken)
     {
+        var pageNumber = Math.Max(1, repositoryQuery.PageNumber);
+        var pageSize = Math.Clamp(repositoryQuery.PageSize, 1, 100);
+
         var query = applicationDbContext.Forecasts.AsNoTracking();
 
         if (repositoryQuery.TemperatureRangeMin.HasValue)
@@ -55,8 +58,8 @@ internal class WeatherForecastRepository(ApplicationDbContext applicationDbConte
 
         List<WeatherForecast> items = await query
             .OrderBy(x => x.Id)
-            .Skip((repositoryQuery.PageNumber - 1) * repositoryQuery.PageSize)
-            .Take(repositoryQuery.PageSize)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
             .ToListAsync(cancellationToken);
 
         return PagedResponse<WeatherForecast>.Create(items, totalCount);

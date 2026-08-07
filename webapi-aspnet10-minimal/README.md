@@ -26,6 +26,23 @@ Migrations are applied automatically at startup; the app fails to start if the d
 - `GET /health/ready`, `GET /health` — require authentication (they expose infrastructure details)
 - `/openapi` — Swagger UI (Local/Development only)
 
+## Configuration
+
+| Setting | Required | Notes |
+|---|---|---|
+| `ConnectionStrings:YourProjectNameDb` | Yes | PostgreSQL connection string |
+| `JwtSettings:Authority` | Yes | JWT authority URL |
+| `JwtSettings:Issuer` | Yes | JWT issuer |
+| `JwtSettings:Audience` | Yes | JWT audience |
+| `RedisSettings:ConnectionString` | No | Redis connection string; falls back to L1-only cache if absent |
+| `RedisSettings:KeyPrefix` | No | Redis key prefix |
+| `OpenTelemetrySettings:OtlpEndpoint` | No | OTLP collector endpoint |
+| `OpenTelemetrySettings:ServiceName` | No | Service name in traces (default: `YourProjectName.WebApi`) |
+| `OpenTelemetrySettings:ServiceVersion` | No | Service version in traces (default: `1.0.0`) |
+| `Serilog` | No | Serilog configuration section |
+
+Sensitive values should be stored via User Secrets or environment variables. See `src/YourProjectName.WebApi/appsettings.Development.json` for examples.
+
 ## ⚠️ Security disclaimer — read before production use
 
 This template ships **development-only** defaults. Before deploying anywhere real:
