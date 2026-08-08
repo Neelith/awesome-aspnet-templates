@@ -64,19 +64,22 @@ internal static class DependencyInjection
         //Enable global exception handling
         app.UseExceptionHandler();
 
-        //Redirect http traffic to https
-        app.UseHttpsRedirection();
-
         //Add authentication and authorization middlewares
         app.UseAuthentication();
 
         app.UseAuthorization();
+
+        //Map health check endpoints
+        app.MapHealthCheckEndpoints();
 
         //Register all the endpoints that implement the IEndpoints interface
         app.MapEndpoints();
 
         //Enable OpenApi documentation and UI
         app.UseOpenApi();
+
+        //Redirect http traffic to https
+        app.UseHttpsRedirection();
 
         //Apply database migrations automatically on every startup
         using IServiceScope scope = app.Services.CreateScope();
