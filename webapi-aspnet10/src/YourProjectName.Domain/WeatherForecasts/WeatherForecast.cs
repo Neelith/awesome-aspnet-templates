@@ -32,7 +32,24 @@ public class WeatherForecast : AuditableEntity
         if (summaryCreationResult?.IsFailure is true)
         {
             return Result.Ko<WeatherForecast>(summaryCreationResult.Errors, summaryCreationResult.Metadata);
+    public Result Update(DateOnly date, int temperatureC, string? summaryValue)
+    {
+        bool isSummaryValorized = !string.IsNullOrEmpty(summaryValue);
+
+        var summaryCreationResult = isSummaryValorized ? Summary.Create(summaryValue!) : null;
+
+        if (summaryCreationResult?.IsFailure is true)
+        {
+            return Result.Ko(summaryCreationResult.Errors, summaryCreationResult.Metadata);
         }
+
+        Date = date;
+        TemperatureC = temperatureC;
+        Summary = isSummaryValorized ? summaryCreationResult!.Value : null;
+
+        return Result.Ok();
+    }
+}
 
         return new WeatherForecast(date, temperatureC, isSummaryValorized ? summaryCreationResult!.Value : null);
     }

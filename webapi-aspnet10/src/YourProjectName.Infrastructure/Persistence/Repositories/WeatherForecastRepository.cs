@@ -11,6 +11,11 @@ internal class WeatherForecastRepository(ApplicationDbContext applicationDbConte
         await applicationDbContext.Forecasts.AddAsync(weatherForecast, cancellationToken);
     }
 
+    public async Task<WeatherForecast?> GetById(int id, CancellationToken cancellationToken)
+    {
+        return await applicationDbContext.Forecasts.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+    }
+
     public async Task<WeatherForecastPage> GetWeatherForecasts(WeatherForecastFilter filter, CancellationToken cancellationToken)
     {
         var pageNumber = Math.Max(1, filter.PageNumber);

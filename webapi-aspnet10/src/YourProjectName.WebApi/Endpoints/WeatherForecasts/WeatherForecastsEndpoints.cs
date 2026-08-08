@@ -1,7 +1,9 @@
 ﻿using Hermes.Responses;
 using Microsoft.AspNetCore.Mvc;
 using YourProjectName.Application.Features.WeatherForecasts.CreateWeatherForecasts;
+using YourProjectName.Application.Features.WeatherForecasts.DeleteWeatherForecastById;
 using YourProjectName.Application.Features.WeatherForecasts.GetWeatherForecasts;
+using YourProjectName.Application.Features.WeatherForecasts.UpdateWeatherForecastById;
 using YourProjectName.WebApi.Constants;
 using YourProjectName.WebApi.Infrastructure.Extensions;
 
@@ -52,6 +54,53 @@ public class WeatherForecastsEndpoints : IEndpoints
         .Produces<IdResponse<int>>(StatusCodes.Status201Created)
         .ProducesProblem(StatusCodes.Status401Unauthorized)
         .ProducesProblem(StatusCodes.Status400BadRequest)
+        .ProducesProblem(StatusCodes.Status500InternalServerError)
+        .RequireAuthorization();
+
+        group.MapPut("{id}", async
+            (int id,
+            [FromBody] UpdateWeatherForecastByIdCommand command,
+            [FromServices] ICommandHandler<UpdateWeatherForecastByIdCommand> handler,
+            CancellationToken cancellationToken) =>
+        {
+            command.Id = id;
+
+            var result = await handler.Handle(command, cancellationToken);
+
+            IResult response = result.IsSuccess
+                ? TypedResults.NoContent()
+                : result.ToErrorResponse();
+
+            return response;
+        })
+        .WithDescription("Updates an existing weather forecast by its identifier.")
+        .Produces(StatusCodes.Status204NoContent)
+        .ProducesProblem(StatusCodes.Status401Unauthorized)
+        .ProducesProblem(StatusCodes.Status400BadRequest)
+        .ProducesProblem(StatusCodes.Status404NotFound)
+        .ProducesProblem(StatusCodes.Status500InternalServerError)
+        .RequireAuthorization();
+
+        group.MapDelete("{id}", async
+            (int id,
+            [FromServices] ICommandHandler<DeleteWeatherForecastByIdCommand> handler,
+            CancellationToken cancellationToken) =>
+        {
+            var command = new DeleteWeatherForecastByIdCommand { Id = id };
+
+            var result = await handler.Handle(command, cancellationToken);
+
+            IResult response = result.IsSuccess
+                ? TypedResults.NoContent()
+                : result.ToErrorResponse();
+
+            return response;
+        })
+        .WithDescription("Deletes an existing weather forecast by its identifier.")
+        .Produces(StatusCodes.Status204NoContent)
+        .ProducesProblem(StatusCodes.Status401Unauthorized)
+        .ProducesProblem(StatusCodes.Status400BadRequest)
+        .ProducesProblem(StatusCodes.Status404NotFound)
         .ProducesProblem(StatusCodes.Status500InternalServerError)
         .RequireAuthorization();
     }
