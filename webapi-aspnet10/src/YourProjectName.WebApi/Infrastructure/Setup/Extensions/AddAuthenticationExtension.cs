@@ -6,17 +6,18 @@ namespace YourProjectName.WebApi.Infrastructure.Setup.Extensions;
 
 public static class AddAuthenticationExtension
 {
-    public static IServiceCollection AddAuthenticationServices(this IServiceCollection services, JwtSettings? jwtSettings)
+    public static IServiceCollection AddAuthenticationServices(
+        this IServiceCollection services,
+        JwtSettings jwtSettings,
+        IHostEnvironment environment)
     {
-        if (jwtSettings is null)
-        {
-            throw new ArgumentNullException(nameof(jwtSettings), "JWT settings must be provided.");
-        }
+        ArgumentNullException.ThrowIfNull(jwtSettings);
 
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         .AddJwtBearer(options =>
         {
-            options.RequireHttpsMetadata = false; // Set to true in production
+            //Https metadata is only disabled for the local development environment
+            options.RequireHttpsMetadata = !environment.IsEnvironment("Local");
             options.Authority = jwtSettings.Authority;
 
             options.TokenValidationParameters = new TokenValidationParameters

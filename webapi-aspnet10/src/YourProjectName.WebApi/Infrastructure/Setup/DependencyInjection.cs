@@ -24,15 +24,14 @@ internal static class DependencyInjection
 
         //Get the database connection string
         string dbConnectionString = configuration.GetConnectionString("YourProjectNameDb")
-            ?? throw new ApplicationException("Connection string 'YourProjectNameDb' not found.");
+            ?? throw new InvalidOperationException("Connection string 'YourProjectNameDb' not found.");
 
-        //Add the redis settings to the container and get an istance of it
-        RedisSettings? redisSettings = services.AddSettings<RedisSettings>(configuration, startupLogger)
-            ?? throw new ApplicationException("Configuration section 'RedisSettings' not found.");
+        //Add the redis settings to the container and get an instance of it (optional, falls back to the in-memory cache)
+        RedisSettings? redisSettings = services.AddSettings<RedisSettings>(configuration, startupLogger);
 
-        //Add the jwt settings to the container and get an istance of it
+        //Add the jwt settings to the container and get an instance of it
         JwtSettings jwtSettings = services.AddSettings<JwtSettings>(configuration, startupLogger)
-            ?? throw new ApplicationException("Configuration section 'JwtSettings' not found.");
+            ?? throw new InvalidOperationException("Configuration section 'JwtSettings' not found.");
 
         //Register services here
         services
@@ -40,7 +39,7 @@ internal static class DependencyInjection
             .AddHttpContextAccessor()
             .AddExceptionHandler<GlobalExceptionHandler>()
             .ConfigureProblemDetails()
-            .AddAuthenticationServices(jwtSettings)
+            .AddAuthenticationServices(jwtSettings, webApplicationBuilder.Environment)
             .AddAuthorizationServices()
             .AddApplicationServices()
             .AddInfrastructureServices(startupLogger, dbConnectionString, redisSettings)

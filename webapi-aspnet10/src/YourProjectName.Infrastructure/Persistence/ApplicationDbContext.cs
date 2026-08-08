@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using Microsoft.EntityFrameworkCore;
-using YourProjectName.Application.Infrastructure.Persistance;
+using Microsoft.Extensions.DependencyInjection;
+using YourProjectName.Application.Infrastructure.Persistence;
 using YourProjectName.Application.Infrastructure.User;
 using YourProjectName.Domain.WeatherForecasts;
 using YourProjectName.Shared.Domain;
@@ -11,7 +12,8 @@ namespace YourProjectName.Infrastructure.Persistence
     internal class ApplicationDbContext(
         DbContextOptions<ApplicationDbContext> options,
         IDateTimeProvider dateTimeProvider,
-        ICurrentUserService currentUserService)
+        ICurrentUserService currentUserService,
+        IServiceProvider serviceProvider)
         : DbContext(options), IUnitOfWork
     {
         protected override void OnModelCreating(ModelBuilder builder)
@@ -20,25 +22,56 @@ namespace YourProjectName.Infrastructure.Persistence
             builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         }
 
-        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken)
+        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken)
         {
             SetAuditablePropertiesOnCreatedEntities();
 
             SetAuditablePropertiesOnUpdatedEntities();
 
-            return base.SaveChangesAsync(cancellationToken);
+            var result = await base.SaveChangesAsync(cancellationToken);
+
+            await DispatchDomainEventsAsync(cancellationToken);
+
+            return result;
+        }
+
+        private async Task DispatchDomainEventsAsync(CancellationToken cancellationToken)
+        {
+            var entitiesWithEvents = ChangeTracker.Entries<Entity>()
+                .Where(entry => entry.Entity.DomainEvents.Count > 0)
+                .Select(entry => entry.Entity)
+                .ToList();
+
+            var domainEvents = entitiesWithEvents.SelectMany(entity => entity.DomainEvents).ToList();
+
+            entitiesWithEvents.ForEach(entity => entity.ClearDomainEvents());
+
+            foreach (var domainEvent in domainEvents)
+            {
+                Type handlerType = typeof(IDomainEventHandler<>).MakeGenericType(domainEvent.GetType());
+
+                foreach (var handler in serviceProvider.GetServices(handlerType))
+                {
+                    if (handler is null)
+                    {
+                        continue;
+                    }
+
+                    await ((dynamic)handler).Handle((dynamic)domainEvent, cancellationToken);
+                }
+            }
         }
 
         private void SetAuditablePropertiesOnCreatedEntities()
         {
-            var entitiesBeignCreated = ChangeTracker.Entries<AuditableEntity>()
+            var entitiesBeingCreated = ChangeTracker.Entries<AuditableEntity>()
                 .Where(entry => entry.State == EntityState.Added);
 
             string createdBy = currentUserService.IsCurrentUserAuthenticated()
                 ? currentUserService.GetCurrentUserId()
                 : "system";
 
-            foreach (var entry in entitiesBeignCreated)
+            foreach (var entry in entitiesBeingCreated)
             {
                 entry.Entity.CreatedAtUtc = dateTimeProvider.UtcNow;
                 entry.Entity.CreatedBy = createdBy;
@@ -47,14 +80,14 @@ namespace YourProjectName.Infrastructure.Persistence
 
         private void SetAuditablePropertiesOnUpdatedEntities()
         {
-            var entitiesBeignUpdated = ChangeTracker.Entries<AuditableEntity>()
+            var entitiesBeingUpdated = ChangeTracker.Entries<AuditableEntity>()
                 .Where(entry => entry.State == EntityState.Modified);
 
             string updatedBy = currentUserService.IsCurrentUserAuthenticated()
                 ? currentUserService.GetCurrentUserId()
                 : "system";
 
-            foreach (var entry in entitiesBeignUpdated)
+            foreach (var entry in entitiesBeingUpdated)
             {
                 entry.Entity.UpdatedAtUtc = dateTimeProvider.UtcNow;
                 entry.Entity.UpdatedBy = updatedBy;
