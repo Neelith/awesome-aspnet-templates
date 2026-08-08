@@ -1,10 +1,9 @@
-﻿using System.Diagnostics;
-using Microsoft.AspNetCore.Diagnostics;
+﻿using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
 namespace YourProjectName.WebApi.Infrastructure.Setup.Middlewares;
 
-internal sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger)
+internal sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger, IProblemDetailsService problemDetailsService)
     : IExceptionHandler
 {
     public async ValueTask<bool> TryHandleAsync(
@@ -14,21 +13,18 @@ internal sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> log
     {
         logger.LogError(exception, "Unhandled exception occurred");
 
-        var problemDetails = new ProblemDetails
+        httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
+
+        return await problemDetailsService.TryWriteAsync(new ProblemDetailsContext
         {
-            Status = StatusCodes.Status500InternalServerError,
-            Type = "https://datatracker.ietf.org/doc/html/rfc7231#section-6.6.1",
-            Title = "Server failure"
-        };
-
-        string traceId = Activity.Current?.Id ?? httpContext.TraceIdentifier;
-
-        problemDetails.Extensions.Add("traceId", traceId);
-
-        httpContext.Response.StatusCode = problemDetails.Status.Value;
-
-        await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
-
-        return true;
+            HttpContext = httpContext,
+            Exception = exception,
+            ProblemDetails = new ProblemDetails
+            {
+                Status = StatusCodes.Status500InternalServerError,
+                Type = "https://datatracker.ietf.org/doc/html/rfc7231#section-6.6.1",
+                Title = "Server failure"
+            }
+        });
     }
 }
