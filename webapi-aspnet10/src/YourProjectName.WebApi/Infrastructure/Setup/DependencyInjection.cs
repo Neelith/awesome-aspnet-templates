@@ -75,13 +75,9 @@ internal static class DependencyInjection
         //Enable OpenApi documentation and UI
         app.UseOpenApi();
 
-        //Apply database migrations automatically only outside production environments.
-        //For production, prefer a dedicated migration step (e.g. a migration bundle in the deploy pipeline).
-        if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("Local"))
-        {
-            using IServiceScope scope = app.Services.CreateScope();
-            ILogger logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
-            AddDatabaseMigrationsExtension.ApplyDatabaseMigrations(scope, logger);
-        }
+        //Apply database migrations automatically on every startup
+        using IServiceScope scope = app.Services.CreateScope();
+        ILogger logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+        AddDatabaseMigrationsExtension.ApplyDatabaseMigrations(scope, logger);
     }
 }
