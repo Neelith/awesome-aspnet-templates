@@ -10,15 +10,14 @@ internal class WeatherForecastRepository(ApplicationDbContext applicationDbConte
 {
     public async Task<Result<WeatherForecast>> CreateWeatherForecast(CreateWeatherForecastRepositoryCommand command, CancellationToken cancellationToken)
     {
-        var date = DateOnly.FromDateTime(command.Date);
-        var weatherForecast = WeatherForecast.Create(date, command.TemperatureC, command.Summary);
+        var weatherForecast = WeatherForecast.Create(command.Date, command.TemperatureC, command.Summary);
 
         if (weatherForecast.IsFailure)
         {
             return Result.Ko<WeatherForecast>(weatherForecast.Errors, weatherForecast.Metadata);
         }
 
-        await applicationDbContext.Forecasts.AddAsync(weatherForecast.Value, cancellationToken);
+        await applicationDbContext.Forecasts.AddAsync(weatherForecast.Value!, cancellationToken);
 
         return weatherForecast;
     }

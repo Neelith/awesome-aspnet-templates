@@ -12,7 +12,7 @@ public sealed class GetWeatherForecastsQueryHandler(
 {
     public async Task<Result<PagedResponse<WeatherForecast>>> Handle(GetWeatherForecastsQuery? query, CancellationToken cancellationToken)
     {
-        const string cacheKey = "weatherforecasts";
+        var cacheKey = $"weatherforecasts:{query?.TemperatureRangeMin}:{query?.TemperatureRangeMax}";
 
         var cachedForecasts = await redisCache.GetAsync<List<WeatherForecast>>(cacheKey, cancellationToken);
 
@@ -32,7 +32,7 @@ public sealed class GetWeatherForecastsQueryHandler(
             return Result.Ko<PagedResponse<WeatherForecast>>(getWeatherForecastsResult.Errors, getWeatherForecastsResult.Metadata);
         }
 
-        var forecasts = getWeatherForecastsResult.Value;
+        var forecasts = getWeatherForecastsResult.Value!;
 
         var response = PagedResponse<WeatherForecast>.Create(forecasts, forecasts.Count);
 
