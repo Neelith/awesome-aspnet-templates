@@ -43,6 +43,7 @@ internal static class DependencyInjection
             .AddHttpContextAccessor()
             .AddExceptionHandler<GlobalExceptionHandler>()
             .ConfigureProblemDetails()
+            .AddHealthCheckServices()
             .AddAuthenticationServices(jwtSettings, webApplicationBuilder.Environment)
             .AddAuthorizationServices()
             .AddApplicationServices()
