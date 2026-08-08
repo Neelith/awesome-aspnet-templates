@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using YourProjectName.Application.Infrastructure.Caching;
 
 namespace YourProjectName.Infrastructure.Caching;
 
@@ -29,8 +28,6 @@ internal static class AddCachingExtension
                 options.InstanceName = redisSettings.KeyPrefix;
             });
         }
-
-        services.AddSingleton<ICacheService, DistributedCacheService>();
 
         return services;
     }
