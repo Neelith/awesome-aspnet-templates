@@ -13,15 +13,8 @@ public static class AddDatabaseMigrationsExtension
 
         try
         {
-            if (dbContext.Database.CanConnect())
-            {
-                logger.LogInformation("Database connection successful. Applying migrations...");
-                dbContext.Database.Migrate();
-            }
-            else
-            {
-                logger.LogWarning("Cannot connect to the database. Migrations will not be applied.");
-            }
+            logger.LogInformation("Applying database migrations...");
+            dbContext.Database.Migrate();
         }
         catch (Exception ex)
         {

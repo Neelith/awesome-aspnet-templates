@@ -38,9 +38,10 @@ public class WeatherForecastsEndpoints : IEndpoints
 
         group.MapPost("", async
             ([FromBody] CreateWeatherForecastCommand command,
-            [FromServices] ICommandHandler<CreateWeatherForecastCommand, IdResponse<int>> handler) =>
+            [FromServices] ICommandHandler<CreateWeatherForecastCommand, IdResponse<int>> handler,
+            CancellationToken cancellationToken) =>
         {
-            var result = await handler.Handle(command, CancellationToken.None);
+            var result = await handler.Handle(command, cancellationToken);
 
             IResult response = result.IsSuccess
                 ? TypedResults.Created($"weatherforecasts/{result.Value?.Data.Id}", result.Value)
