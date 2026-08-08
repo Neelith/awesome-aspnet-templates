@@ -5,10 +5,10 @@ using YourProjectName.Application.Infrastructure.Caching;
 
 namespace YourProjectName.Infrastructure.Caching;
 
-internal class RedisCache(
+internal class DistributedCacheService(
     IDistributedCache distributedCache,
-    ILogger<RedisCache> logger)
-    : IRedisCache
+    ILogger<DistributedCacheService> logger)
+    : ICacheService
 {
     public async Task<T?> GetAsync<T>(string key, CancellationToken cancellationToken = default)
     {

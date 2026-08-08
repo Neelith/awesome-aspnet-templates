@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using YourProjectName.Application.Features.WeatherForecasts.CreateWeatherForecasts;
 using YourProjectName.Application.Features.WeatherForecasts.GetWeatherForecasts;
-using YourProjectName.Domain.WeatherForecasts;
 using YourProjectName.WebApi.Constants;
 using YourProjectName.WebApi.Infrastructure.Extensions;
 
@@ -18,7 +17,7 @@ public class WeatherForecastsEndpoints : IEndpoints
 
         group.MapGet("", async
             ([AsParameters] GetWeatherForecastsQuery query,
-            [FromServices] IQueryHandler<GetWeatherForecastsQuery, PagedResponse<WeatherForecast>> handler,
+            [FromServices] IQueryHandler<GetWeatherForecastsQuery, PagedResponse<WeatherForecastResponse>> handler,
             CancellationToken cancellationToken) =>
         {
             var result = await handler.Handle(query, cancellationToken);
@@ -30,7 +29,7 @@ public class WeatherForecastsEndpoints : IEndpoints
             return response;
         })
         .WithDescription("Retrieves a list of weather forecasts based on the provided query parameters.")
-        .Produces<PagedResponse<WeatherForecast>>(StatusCodes.Status200OK)
+        .Produces<PagedResponse<WeatherForecastResponse>>(StatusCodes.Status200OK)
         .ProducesProblem(StatusCodes.Status401Unauthorized)
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .ProducesProblem(StatusCodes.Status500InternalServerError)

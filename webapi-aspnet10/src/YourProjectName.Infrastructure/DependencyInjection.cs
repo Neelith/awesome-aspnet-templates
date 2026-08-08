@@ -22,7 +22,7 @@ public static class DependencyInjection
         services.AddTime()
                 .AddDbContext(dbConnectionString)
                 .AddRepositories()
-                .AddRedis(redisSettings, logger)
+                .AddCaching(redisSettings, logger)
                 .AddCurrentUserService();
 
         return services;

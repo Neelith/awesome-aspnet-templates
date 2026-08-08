@@ -1,41 +1,41 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using YourProjectName.Domain.WeatherForecasts;
 using YourProjectName.Domain.WeatherForecasts.Repositories.WeatherForecastRepository;
-using YourProjectName.Domain.WeatherForecasts.Repositories.WeatherForecastRepository.Commands;
-using YourProjectName.Domain.WeatherForecasts.Repositories.WeatherForecastRepository.Queries;
 
 namespace YourProjectName.Infrastructure.Persistence.Repositories;
 
 internal class WeatherForecastRepository(ApplicationDbContext applicationDbContext) : IWeatherForecastRepository
 {
-    public async Task<Result<WeatherForecast>> CreateWeatherForecast(CreateWeatherForecastRepositoryCommand command, CancellationToken cancellationToken)
+    public async Task AddWeatherForecast(WeatherForecast weatherForecast, CancellationToken cancellationToken)
     {
-        var weatherForecast = WeatherForecast.Create(command.Date, command.TemperatureC, command.Summary);
-
-        if (weatherForecast.IsFailure)
-        {
-            return Result.Ko<WeatherForecast>(weatherForecast.Errors, weatherForecast.Metadata);
-        }
-
-        await applicationDbContext.Forecasts.AddAsync(weatherForecast.Value!, cancellationToken);
-
-        return weatherForecast;
+        await applicationDbContext.Forecasts.AddAsync(weatherForecast, cancellationToken);
     }
 
-    public async Task<Result<List<WeatherForecast>>> GetWeatherForecasts(GetWeatherForecastsRepositoryQuery? repositoryQuery, CancellationToken cancellationToken)
+    public async Task<WeatherForecastPage> GetWeatherForecasts(WeatherForecastFilter filter, CancellationToken cancellationToken)
     {
+        var pageNumber = Math.Max(1, filter.PageNumber);
+        var pageSize = Math.Clamp(filter.PageSize, 1, 100);
+
         var query = applicationDbContext.Forecasts.AsNoTracking();
 
-        if (repositoryQuery is not null && repositoryQuery.TemperatureRangeMin.HasValue)
+        if (filter.TemperatureRangeMin.HasValue)
         {
-            query = query.Where(x => x.TemperatureC >= repositoryQuery.TemperatureRangeMin.Value);
+            query = query.Where(x => x.TemperatureC >= filter.TemperatureRangeMin.Value);
         }
 
-        if (repositoryQuery is not null && repositoryQuery.TemperatureRangeMax.HasValue)
+        if (filter.TemperatureRangeMax.HasValue)
         {
-            query = query.Where(x => x.TemperatureC <= repositoryQuery.TemperatureRangeMax.Value);
+            query = query.Where(x => x.TemperatureC <= filter.TemperatureRangeMax.Value);
         }
 
-        return await query.ToListAsync(cancellationToken);
+        var totalCount = await query.CountAsync(cancellationToken);
+
+        List<WeatherForecast> items = await query
+            .OrderBy(x => x.Id)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
+
+        return new WeatherForecastPage(items, totalCount);
     }
 }

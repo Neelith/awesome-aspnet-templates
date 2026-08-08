@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using YourProjectName.Shared.Domain;
+using YourProjectName.Domain.Shared;
 
 namespace YourProjectName.Infrastructure.Persistence.Configurations;
 

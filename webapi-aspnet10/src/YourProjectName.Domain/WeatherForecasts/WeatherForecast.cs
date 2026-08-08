@@ -1,5 +1,4 @@
-﻿using System.Text.Json.Serialization;
-using YourProjectName.Shared.Domain;
+﻿using YourProjectName.Domain.Shared;
 
 namespace YourProjectName.Domain.WeatherForecasts;
 
@@ -20,12 +19,6 @@ public class WeatherForecast : AuditableEntity
 
     //EF constructor
     private WeatherForecast(int id, DateOnly date, int temperatureC) : this(date, temperatureC, null)
-    {
-        Id = id;
-    }
-
-    [JsonConstructor]
-    private WeatherForecast(int id, DateOnly date, int temperatureC, Summary? summary) : this(date, temperatureC, summary)
     {
         Id = id;
     }

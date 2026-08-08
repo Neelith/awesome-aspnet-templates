@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Diagnostics;
+﻿using System.Diagnostics;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using YourProjectName.WebApi.Constants;
 
 namespace YourProjectName.WebApi.Infrastructure.Setup.Middlewares;
 
@@ -21,9 +21,7 @@ internal sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> log
             Title = "Server failure"
         };
 
-        string traceId = httpContext.Request.Headers.TryGetValue(Headers.Trace, out var traceHeaderValue) && !string.IsNullOrWhiteSpace(traceHeaderValue)
-            ? traceHeaderValue.ToString()
-            : httpContext.TraceIdentifier;
+        string traceId = Activity.Current?.Id ?? httpContext.TraceIdentifier;
 
         problemDetails.Extensions.Add("traceId", traceId);
 

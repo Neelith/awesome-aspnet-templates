@@ -1,12 +1,9 @@
-﻿using System.Text.Json.Serialization;
-
-namespace YourProjectName.Shared.Domain;
+﻿namespace YourProjectName.Domain.Shared;
 
 public abstract class Entity
 {
     private readonly List<IDomainEvent> _domainEvents = [];
 
-    [JsonIgnore]
     public IReadOnlyList<IDomainEvent> DomainEvents => [.. _domainEvents];
 
     public void ClearDomainEvents()

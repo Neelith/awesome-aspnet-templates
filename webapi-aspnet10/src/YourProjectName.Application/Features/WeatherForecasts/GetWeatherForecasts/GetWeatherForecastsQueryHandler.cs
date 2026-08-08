@@ -1,42 +1,35 @@
-﻿using YourProjectName.Application.Infrastructure.Caching;
-using YourProjectName.Domain.WeatherForecasts;
+using YourProjectName.Application.Infrastructure.Caching;
 using YourProjectName.Domain.WeatherForecasts.Repositories.WeatherForecastRepository;
-using YourProjectName.Domain.WeatherForecasts.Repositories.WeatherForecastRepository.Queries;
 
 namespace YourProjectName.Application.Features.WeatherForecasts.GetWeatherForecasts;
 
 public sealed class GetWeatherForecastsQueryHandler(
     IWeatherForecastRepository weatherForecastRepository,
-    IRedisCache redisCache)
-    : IQueryHandler<GetWeatherForecastsQuery, PagedResponse<WeatherForecast>>
+    ICacheService cacheService)
+    : IQueryHandler<GetWeatherForecastsQuery, PagedResponse<WeatherForecastResponse>>
 {
-    public async Task<Result<PagedResponse<WeatherForecast>>> Handle(GetWeatherForecastsQuery? query, CancellationToken cancellationToken)
+    public async Task<Result<PagedResponse<WeatherForecastResponse>>> Handle(GetWeatherForecastsQuery query, CancellationToken cancellationToken)
     {
-        var cacheKey = $"weatherforecasts:{query?.TemperatureRangeMin}:{query?.TemperatureRangeMax}";
+        var cacheKey = $"weatherforecasts:{query.TemperatureRangeMin}:{query.TemperatureRangeMax}:{query.PageNumber}:{query.PageSize}";
 
-        var cachedForecasts = await redisCache.GetAsync<List<WeatherForecast>>(cacheKey, cancellationToken);
+        var cachedResponse = await cacheService.GetAsync<PagedResponse<WeatherForecastResponse>>(cacheKey, cancellationToken);
 
-        if (cachedForecasts is not null)
+        if (cachedResponse is not null)
         {
-            return PagedResponse<WeatherForecast>.Create(cachedForecasts, cachedForecasts.Count);
+            return cachedResponse;
         }
 
-        var getWeatherForecastsResult = await weatherForecastRepository.GetWeatherForecasts(new GetWeatherForecastsRepositoryQuery
-        {
-            TemperatureRangeMin = query?.TemperatureRangeMin,
-            TemperatureRangeMax = query?.TemperatureRangeMax
-        }, cancellationToken);
+        var page = await weatherForecastRepository.GetWeatherForecasts(new WeatherForecastFilter(
+            query.TemperatureRangeMin,
+            query.TemperatureRangeMax,
+            query.PageNumber,
+            query.PageSize), cancellationToken);
 
-        if (getWeatherForecastsResult.IsFailure)
-        {
-            return Result.Ko<PagedResponse<WeatherForecast>>(getWeatherForecastsResult.Errors, getWeatherForecastsResult.Metadata);
-        }
+        var response = PagedResponse<WeatherForecastResponse>.Create(
+            page.Items.Select(WeatherForecastResponse.FromDomain).ToList(),
+            page.TotalCount);
 
-        var forecasts = getWeatherForecastsResult.Value!;
-
-        var response = PagedResponse<WeatherForecast>.Create(forecasts, forecasts.Count);
-
-        await redisCache.SetAsync(cacheKey, forecasts, TimeSpan.FromMinutes(2), cancellationToken);
+        await cacheService.SetAsync(cacheKey, response, TimeSpan.FromMinutes(2), cancellationToken);
 
         return response;
     }

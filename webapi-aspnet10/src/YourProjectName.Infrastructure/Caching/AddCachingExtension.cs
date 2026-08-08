@@ -4,9 +4,9 @@ using YourProjectName.Application.Infrastructure.Caching;
 
 namespace YourProjectName.Infrastructure.Caching;
 
-internal static class AddRedisExtension
+internal static class AddCachingExtension
 {
-    public static IServiceCollection AddRedis(
+    public static IServiceCollection AddCaching(
         this IServiceCollection services,
         RedisSettings? redisSettings,
         ILogger logger)
@@ -30,7 +30,7 @@ internal static class AddRedisExtension
             });
         }
 
-        services.AddSingleton<IRedisCache, RedisCache>();
+        services.AddSingleton<ICacheService, DistributedCacheService>();
 
         return services;
     }

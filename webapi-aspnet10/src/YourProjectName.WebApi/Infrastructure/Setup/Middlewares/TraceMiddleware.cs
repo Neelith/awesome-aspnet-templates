@@ -1,4 +1,5 @@
-﻿using Serilog.Context;
+using System.Diagnostics;
+using Serilog.Context;
 using YourProjectName.WebApi.Constants;
 
 namespace YourProjectName.WebApi.Infrastructure.Setup.Middlewares;
@@ -7,9 +8,9 @@ public class TraceMiddleware(RequestDelegate next)
 {
     public async Task InvokeAsync(HttpContext context)
     {
-        string traceId = context.Request.Headers.TryGetValue(Headers.Trace, out var traceHeaderValue) && !string.IsNullOrWhiteSpace(traceHeaderValue)
-            ? traceHeaderValue.ToString()
-            : context.TraceIdentifier;
+        //The trace id is always generated server side (W3C Activity or the connection trace identifier):
+        //client-provided header values are never trusted, to avoid log forging.
+        string traceId = Activity.Current?.Id ?? context.TraceIdentifier;
 
         context.Response.Headers.TryAdd(Headers.Trace, traceId);
 
