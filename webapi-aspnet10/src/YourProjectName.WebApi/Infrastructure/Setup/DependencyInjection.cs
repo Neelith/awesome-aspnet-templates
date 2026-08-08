@@ -33,6 +33,10 @@ internal static class DependencyInjection
         JwtSettings jwtSettings = services.AddSettings<JwtSettings>(configuration, startupLogger)
             ?? throw new InvalidOperationException("Configuration section 'JwtSettings' not found.");
 
+        //Add the OpenTelemetry settings to the container and get an instance of it
+        OpenTelemetrySettings telemetrySettings = services.AddSettings<OpenTelemetrySettings>(configuration, startupLogger)
+            ?? new OpenTelemetrySettings();
+
         //Register services here
         services
             .AddRouting(options => options.LowercaseUrls = true)
@@ -43,6 +47,7 @@ internal static class DependencyInjection
             .AddAuthorizationServices()
             .AddApplicationServices()
             .AddInfrastructureServices(startupLogger, dbConnectionString, redisSettings)
+            .AddTelemetry(telemetrySettings, webApplicationBuilder.Environment)
             .AddEndpoints(Assembly.GetExecutingAssembly())
             .AddOpenApiServices(jwtSettings);
 
