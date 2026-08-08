@@ -1,13 +1,13 @@
-﻿using System.Text.Json.Serialization;
-using ResultExtensions = YourProjectName.Shared.Results.ResultExtensions;
+﻿using ResultExtensions = YourProjectName.Shared.Results.ResultExtensions;
 
 namespace YourProjectName.Domain.WeatherForecasts;
 
 public record Summary
 {
+    public const int MaxLength = 256;
+
     public string Value { get; private set; }
 
-    [JsonConstructor]
     private Summary(string value)
     {
         Value = value;
@@ -20,7 +20,7 @@ public record Summary
             return ResultExtensions.BadRequest<Summary>([SummaryErrors.NullOrEmpty]);
         }
 
-        if (value.Length > 256)
+        if (value.Length > MaxLength)
         {
             return ResultExtensions.BadRequest<Summary>([SummaryErrors.SummaryTooLong]);
         }

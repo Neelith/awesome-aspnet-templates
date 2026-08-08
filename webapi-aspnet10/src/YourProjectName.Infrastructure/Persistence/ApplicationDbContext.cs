@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using YourProjectName.Application.Infrastructure.Persistence;
 using YourProjectName.Application.Infrastructure.User;
 using YourProjectName.Domain.WeatherForecasts;
-using YourProjectName.Shared.Domain;
+using YourProjectName.Domain.Shared;
 using YourProjectName.Shared.Time;
 
 namespace YourProjectName.Infrastructure.Persistence
@@ -73,8 +73,8 @@ namespace YourProjectName.Infrastructure.Persistence
 
             foreach (var entry in entitiesBeingCreated)
             {
-                entry.Entity.CreatedAtUtc = dateTimeProvider.UtcNow;
-                entry.Entity.CreatedBy = createdBy;
+                entry.Property(e => e.CreatedAtUtc).CurrentValue = dateTimeProvider.UtcNow;
+                entry.Property(e => e.CreatedBy).CurrentValue = createdBy;
             }
         }
 
@@ -89,8 +89,8 @@ namespace YourProjectName.Infrastructure.Persistence
 
             foreach (var entry in entitiesBeingUpdated)
             {
-                entry.Entity.UpdatedAtUtc = dateTimeProvider.UtcNow;
-                entry.Entity.UpdatedBy = updatedBy;
+                entry.Property(e => e.UpdatedAtUtc).CurrentValue = dateTimeProvider.UtcNow;
+                entry.Property(e => e.UpdatedBy).CurrentValue = updatedBy;
             }
         }
 

@@ -1,42 +1,45 @@
-﻿using YourProjectName.Application.Infrastructure.Caching;
-using YourProjectName.Domain.WeatherForecasts;
+using System.Text.Json;
+using Microsoft.Extensions.Caching.Distributed;
 using YourProjectName.Domain.WeatherForecasts.Repositories.WeatherForecastRepository;
-using YourProjectName.Domain.WeatherForecasts.Repositories.WeatherForecastRepository.Queries;
 
 namespace YourProjectName.Application.Features.WeatherForecasts.GetWeatherForecasts;
 
 public sealed class GetWeatherForecastsQueryHandler(
     IWeatherForecastRepository weatherForecastRepository,
-    IRedisCache redisCache)
-    : IQueryHandler<GetWeatherForecastsQuery, PagedResponse<WeatherForecast>>
+    IDistributedCache distributedCache)
+    : IQueryHandler<GetWeatherForecastsQuery, PagedResponse<WeatherForecastResponse>>
 {
-    public async Task<Result<PagedResponse<WeatherForecast>>> Handle(GetWeatherForecastsQuery? query, CancellationToken cancellationToken)
+    public async Task<Result<PagedResponse<WeatherForecastResponse>>> Handle(GetWeatherForecastsQuery query, CancellationToken cancellationToken)
     {
-        var cacheKey = $"weatherforecasts:{query?.TemperatureRangeMin}:{query?.TemperatureRangeMax}";
+        var cacheKey = $"weatherforecasts:{query.TemperatureRangeMin}:{query.TemperatureRangeMax}:{query.PageNumber}:{query.PageSize}";
 
-        var cachedForecasts = await redisCache.GetAsync<List<WeatherForecast>>(cacheKey, cancellationToken);
+        var cachedValue = await distributedCache.GetStringAsync(cacheKey, cancellationToken);
 
-        if (cachedForecasts is not null)
+        if (cachedValue is not null)
         {
-            return PagedResponse<WeatherForecast>.Create(cachedForecasts, cachedForecasts.Count);
+            var cachedResponse = JsonSerializer.Deserialize<PagedResponse<WeatherForecastResponse>>(cachedValue);
+            if (cachedResponse is not null)
+            {
+                return cachedResponse;
+            }
         }
 
-        var getWeatherForecastsResult = await weatherForecastRepository.GetWeatherForecasts(new GetWeatherForecastsRepositoryQuery
+        var page = await weatherForecastRepository.GetWeatherForecasts(new WeatherForecastFilter(
+            query.TemperatureRangeMin,
+            query.TemperatureRangeMax,
+            query.PageNumber,
+            query.PageSize), cancellationToken);
+
+        var response = PagedResponse<WeatherForecastResponse>.Create(
+            page.Items.Select(WeatherForecastResponse.FromDomain).ToList(),
+            page.TotalCount);
+
+        var options = new DistributedCacheEntryOptions
         {
-            TemperatureRangeMin = query?.TemperatureRangeMin,
-            TemperatureRangeMax = query?.TemperatureRangeMax
-        }, cancellationToken);
+            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(2)
+        };
 
-        if (getWeatherForecastsResult.IsFailure)
-        {
-            return Result.Ko<PagedResponse<WeatherForecast>>(getWeatherForecastsResult.Errors, getWeatherForecastsResult.Metadata);
-        }
-
-        var forecasts = getWeatherForecastsResult.Value!;
-
-        var response = PagedResponse<WeatherForecast>.Create(forecasts, forecasts.Count);
-
-        await redisCache.SetAsync(cacheKey, forecasts, TimeSpan.FromMinutes(2), cancellationToken);
+        await distributedCache.SetStringAsync(cacheKey, JsonSerializer.Serialize(response), options, cancellationToken);
 
         return response;
     }

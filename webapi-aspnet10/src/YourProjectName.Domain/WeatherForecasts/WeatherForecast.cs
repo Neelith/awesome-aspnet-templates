@@ -1,5 +1,4 @@
-﻿using System.Text.Json.Serialization;
-using YourProjectName.Shared.Domain;
+﻿using YourProjectName.Domain.Shared;
 
 namespace YourProjectName.Domain.WeatherForecasts;
 
@@ -24,12 +23,6 @@ public class WeatherForecast : AuditableEntity
         Id = id;
     }
 
-    [JsonConstructor]
-    private WeatherForecast(int id, DateOnly date, int temperatureC, Summary? summary) : this(date, temperatureC, summary)
-    {
-        Id = id;
-    }
-
     public static Result<WeatherForecast> Create(DateOnly date, int temperatureC, string? summaryValue)
     {
         bool isSummaryValorized = !string.IsNullOrEmpty(summaryValue);
@@ -42,5 +35,23 @@ public class WeatherForecast : AuditableEntity
         }
 
         return new WeatherForecast(date, temperatureC, isSummaryValorized ? summaryCreationResult!.Value : null);
+    }
+
+    public Result Update(DateOnly date, int temperatureC, string? summaryValue)
+    {
+        bool isSummaryValorized = !string.IsNullOrEmpty(summaryValue);
+
+        var summaryCreationResult = isSummaryValorized ? Summary.Create(summaryValue!) : null;
+
+        if (summaryCreationResult?.IsFailure is true)
+        {
+            return Result.Ko(summaryCreationResult.Errors, summaryCreationResult.Metadata);
+        }
+
+        Date = date;
+        TemperatureC = temperatureC;
+        Summary = isSummaryValorized ? summaryCreationResult!.Value : null;
+
+        return Result.Ok();
     }
 }

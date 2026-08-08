@@ -1,4 +1,6 @@
-﻿namespace YourProjectName.Application.Features.WeatherForecasts.CreateWeatherForecasts;
+﻿using YourProjectName.Domain.WeatherForecasts;
+
+namespace YourProjectName.Application.Features.WeatherForecasts.CreateWeatherForecasts;
 
 public class CreateWeatherForecastCommandValidator : AbstractValidator<CreateWeatherForecastCommand>
 {
@@ -6,6 +8,6 @@ public class CreateWeatherForecastCommandValidator : AbstractValidator<CreateWea
     {
         RuleFor(x => x.Date).NotEmpty().WithMessage("Date is required.");
         RuleFor(x => x.TemperatureC).InclusiveBetween(-100, 100).WithMessage("Temperature must be between -100 and 100.");
-        RuleFor(x => x.Summary).MaximumLength(256).WithMessage("Summary cannot exceed 256 characters.");
+        RuleFor(x => x.Summary).MaximumLength(Summary.MaxLength).WithMessage($"Summary cannot exceed {Summary.MaxLength} characters.");
     }
 }

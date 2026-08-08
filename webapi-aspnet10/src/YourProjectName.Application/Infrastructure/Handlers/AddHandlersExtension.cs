@@ -23,11 +23,11 @@ public static class AddHandlersExtension
         services.AddHandlerDecorator(typeof(ICommandHandler<>), typeof(ValidationDecorator.CommandBaseHandler<>));
         services.AddHandlerDecorator(typeof(IQueryHandler<,>), typeof(ValidationDecorator.QueryHandler<,>));
 
-        //Here we decorate the handlers with the logging decorator
-        //This decorator will log the handler before and after executing it
-        services.AddHandlerDecorator(typeof(ICommandHandler<,>), typeof(LoggingDecorator.CommandHandler<,>));
-        services.AddHandlerDecorator(typeof(ICommandHandler<>), typeof(LoggingDecorator.CommandBaseHandler<>));
-        services.AddHandlerDecorator(typeof(IQueryHandler<,>), typeof(LoggingDecorator.QueryHandler<,>));
+        //Here we decorate the handlers with the tracing decorator
+        //This decorator will start an OTel Activity span per handler
+        services.AddHandlerDecorator(typeof(ICommandHandler<,>), typeof(TracingDecorator.CommandHandler<,>));
+        services.AddHandlerDecorator(typeof(ICommandHandler<>), typeof(TracingDecorator.CommandBaseHandler<>));
+        services.AddHandlerDecorator(typeof(IQueryHandler<,>), typeof(TracingDecorator.QueryHandler<,>));
 
         return services;
     }

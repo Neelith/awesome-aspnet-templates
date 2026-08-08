@@ -1,23 +1,66 @@
 services:
-  postgres-compose:
-    image: postgres:17
-    container_name: postgres
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
     environment:
-      - POSTGRES_DB=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__YourProjectNameDb: "Host=postgres;Port=5432;Database=postgres;Username=postgres;Password=postgres;Pooling=true"
+      RedisSettings__ConnectionString: "redis:6379"
+      RedisSettings__KeyPrefix: "dev"
+      JwtSettings__Authority: "http://keycloak:8080/realms/master"
+      JwtSettings__Issuer: "http://localhost:5000/realms/master"
+      JwtSettings__Audience: "account"
+      OpenTelemetrySettings__OtlpEndpoint: "http://aspire-dashboard:4317"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
     volumes:
       - ./.containers/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:8.2
     ports:
-      - 5432:5432
-  redis-compose:
-    image: redis:latest
-    container_name: redis
+      - "6379:6379"
+    volumes:
+      - ./.containers/redis:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  aspire-dashboard:
+    image: mcr.microsoft.com/dotnet/aspire-dashboard:13.0
     ports:
-      - 6379:6379
-  postgres-keycloak-compose:
+      - "18888:18888"
+      - "4317:4317"
+      - "4318:4318"
+    environment:
+      - DOTNET_DASHBOARD_OTLP_ENDPOINT_URL=http://0.0.0.0:4317
+      - DOTNET_DASHBOARD_OTLP_HTTP_ENDPOINT_URL=http://0.0.0.0:4318
+      - ASPNETCORE_URLS=http://0.0.0.0:18888
+
+  keycloak-postgres:
     image: postgres:17
-    container_name: keycloak-postgres
     environment:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
@@ -26,35 +69,29 @@ services:
       - ./.containers/keycloak/postgres:/var/lib/postgresql/data
     ports:
       - 5433:5432
-  keycloak-compose:
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  keycloak:
     image: quay.io/keycloak/keycloak:26.2.5
-    container_name: keycloak
     environment:
       - KC_DB=postgres
-      - KC_DB_URL_HOST=postgres-keycloak-compose
+      - KC_DB_URL_HOST=keycloak-postgres
       - KC_DB_URL_PORT=5432
       - KC_DB_URL_DATABASE=postgres
       - KC_DB_USERNAME=postgres
       - KC_DB_PASSWORD=postgres
       - KC_BOOTSTRAP_ADMIN_USERNAME=admin
       - KC_BOOTSTRAP_ADMIN_PASSWORD=admin
-    command: start-dev --import-realm
+    command: start-dev
     ports:
       - 5000:8080
     volumes:
       - ./.containers/keycloak/import:/opt/keycloak/data/import
       - ./.containers/keycloak/providers:/opt/keycloak/providers
     depends_on:
-      - postgres-keycloak-compose
-  yourprojectname.webapi:
-    image: ${DOCKER_REGISTRY-}yourprojectnamewebapi
-    build:
-      context: .
-      dockerfile: YourProjectName.WebApi/Dockerfile
-    ports:
-      - 8080:8080
-      - 8081:8081
-    depends_on:
-      - postgres-compose
-      - redis-compose
-      - keycloak-compose
+      keycloak-postgres:
+        condition: service_healthy

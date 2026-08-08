@@ -1,4 +1,4 @@
-﻿using YourProjectName.WebApi.Constants;
+﻿using System.Diagnostics;
 
 namespace YourProjectName.WebApi.Infrastructure.Setup.Extensions;
 
@@ -22,10 +22,8 @@ internal static class AddProblemDetailsExtension
                             context.ProblemDetails.Extensions.TryAdd("endpoint", $"{method} {instance}");
                         }
 
-                        // Add traceId property
-                        string traceId = httpContext.Request.Headers.TryGetValue(Headers.Trace, out var traceHeader)
-                            ? traceHeader.ToString()
-                            : httpContext.TraceIdentifier;
+                        // Add traceId property using server-generated trace identifier
+                        string traceId = Activity.Current?.TraceId.ToString() ?? httpContext.TraceIdentifier;
 
                         context.ProblemDetails.Extensions.TryAdd("traceId", traceId);
 

@@ -33,16 +33,22 @@ internal static class DependencyInjection
         JwtSettings jwtSettings = services.AddSettings<JwtSettings>(configuration, startupLogger)
             ?? throw new InvalidOperationException("Configuration section 'JwtSettings' not found.");
 
+        //Add the OpenTelemetry settings to the container and get an instance of it
+        OpenTelemetrySettings telemetrySettings = services.AddSettings<OpenTelemetrySettings>(configuration, startupLogger)
+            ?? new OpenTelemetrySettings();
+
         //Register services here
         services
             .AddRouting(options => options.LowercaseUrls = true)
             .AddHttpContextAccessor()
             .AddExceptionHandler<GlobalExceptionHandler>()
             .ConfigureProblemDetails()
+            .AddHealthCheckServices()
             .AddAuthenticationServices(jwtSettings, webApplicationBuilder.Environment)
             .AddAuthorizationServices()
             .AddApplicationServices()
             .AddInfrastructureServices(startupLogger, dbConnectionString, redisSettings)
+            .AddTelemetry(telemetrySettings, webApplicationBuilder.Environment)
             .AddEndpoints(Assembly.GetExecutingAssembly())
             .AddOpenApiServices(jwtSettings);
 
@@ -52,9 +58,6 @@ internal static class DependencyInjection
     // Configure the HTTP request pipeline.
     public static void UseAppServices(this WebApplication app)
     {
-        //Add x-trace header to all responses
-        app.UseMiddleware<TraceMiddleware>();
-
         //Enable logging
         app.UseLogging();
 
@@ -66,15 +69,19 @@ internal static class DependencyInjection
 
         app.UseAuthorization();
 
+        //Map health check endpoints
+        app.MapHealthCheckEndpoints();
+
         //Register all the endpoints that implement the IEndpoints interface
         app.MapEndpoints();
 
         //Enable OpenApi documentation and UI
         app.UseOpenApi();
 
+        //Redirect http traffic to https
         app.UseHttpsRedirection();
 
-        //Apply database migrations
+        //Apply database migrations automatically on every startup
         using IServiceScope scope = app.Services.CreateScope();
         ILogger logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
         AddDatabaseMigrationsExtension.ApplyDatabaseMigrations(scope, logger);
